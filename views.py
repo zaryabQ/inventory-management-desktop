@@ -1,22 +1,18 @@
 from pprint import pprint
 from flet import *
-
-from under_development import Under
-
 import sqlite3
-con = sqlite3.connect('sql.db',check_same_thread=False)
+
+con = sqlite3.connect('sql.db', check_same_thread=False)
 cur = con.cursor()
 
 BG = "#000000"
 FW = "#ffffff"
 GST = 0.15
 
-
 # Login page
 class Login(UserControl):
     def __init__(self, page: Page):
         super().__init__()
-
         self.page = page
 
     name = TextField(
@@ -24,7 +20,6 @@ class Login(UserControl):
         hint_text="Enter Cashiers Name",
         text_align="center",
         autofocus=True,
-        # value=name,
         bgcolor=BG,
         border_color=FW,
     )
@@ -37,8 +32,6 @@ class Login(UserControl):
     )
     greetings = Column()
 
-    # print(self.name.value)
-
     def build(self):
         def handleLogin(e):
             con = sqlite3.connect("sql.db")
@@ -47,11 +40,9 @@ class Login(UserControl):
                 f'''SELECT * FROM Cashiers where name = "{self.name.value}" AND password = "{self.password.value}"'''
             )
             users = [i for i in res.fetchall()]
-            # print(users)
             if users == []:
                 print("Error!")
             else:
-                # con.close()
                 self.page.go("/Home")
 
         self.container = Container(
@@ -96,9 +87,7 @@ class Login(UserControl):
             padding=25,
             border_radius=50,
         )
-
         return self.container
-
 
 # Menu page
 class Menu(UserControl):
@@ -109,11 +98,9 @@ class Menu(UserControl):
         cur = con.cursor()
         res = cur.execute("SELECT * FROM Menu")
         self.menu = [i for i in res.fetchall()]
-        # print(self.menu)
 
     def build(self):
         self.container = ListView(
-            # alignment=alignment.center,
             controls=[
                 Container(
                     content=Row(
@@ -148,7 +135,6 @@ class Menu(UserControl):
             ],
         )
         return self.container
-
 
 # Home page
 class Home(UserControl):
@@ -205,7 +191,6 @@ class Home(UserControl):
         )
         return self.container
 
-
 # Billing page
 class Billing(UserControl):
     def __init__(self, page: Page):
@@ -230,7 +215,6 @@ class Billing(UserControl):
             self.page.update()
 
         def close_gen_dlg(e):
-            # self.cart_items = []
             self.cart_items.pop()
             self.cart_items.pop()
             self.cart_items.pop()
@@ -239,7 +223,6 @@ class Billing(UserControl):
             self.page.update()
 
         def handleAddItem(e):
-            print("add")
             con = sqlite3.connect("sql.db")
             cur = con.cursor()
             res = cur.execute(
@@ -301,7 +284,6 @@ class Billing(UserControl):
                 TextButton("Close", on_click=close_gen_dlg),
             ],
             actions_alignment=MainAxisAlignment.END,
-            # on_dismiss=lambda e: print(e),
         )
 
         self.billingpage = Column(
@@ -337,7 +319,6 @@ class Billing(UserControl):
             horizontal_alignment=CrossAxisAlignment.START
         )
         return self.billingpage
-
 
 # Setting page
 class Setting(UserControl):
@@ -386,115 +367,46 @@ class Setting(UserControl):
                 "Add Item",
                 on_click=lambda _: Add_Item(),
             ),
-            
+            t,
         ]
-
-        def Delete_Item():
-            cur.execute(f'''
-                Delete from Menu   
-                WHERE name= "{name.value}"
-                ''')
-
-            con.commit()
-
-        delete_item = [
-            name,
-            ElevatedButton(
-                "Delete Item",
-                on_click=lambda _: Delete_Item(),
-            ),
-        ]
-
-        def Update_Item():
-            cur.execute(f'''
-                UPDATE Menu   
-                SET price = {price.value}
-                WHERE name= "{name.value}"
-                ''')
-
-            con.commit()
-                                                                   
-        update_item = [
-            name,
-            price,
-            ElevatedButton(
-                "Update Item",
-                on_click=lambda _: Update_Item(),
-            ),
-        ]
-
-        def GST_Update():
+        def Update_Gst():
             global GST
-            GST = float(gst.value)
-            print(GST)
-            
+            GST = int(gst.value) / 100
 
-        gst_update = [
-            gst,
-            ElevatedButton(
-                "Update GST",
-                on_click=lambda _: GST_Update(),
-            ),
-        ]
-
-        def radiogroup_changed(e):
-            screens = {
-                "updateProd": update_item,
-                "deleteProd": delete_item,
-                "addProd": add_item,
-                "updateGST": gst_update,
-            }
-            c.controls = screens[e.control.value]
-            c.update()
-
-        self.settings = Column(
+        c.controls.extend(
             [
                 ElevatedButton(
-                                "Back", on_click=lambda _: self.page.go("/Home")
-                            ),
-                RadioGroup(
-                    content=Column(
-                        [
-                            Radio(value="updateProd", label="Update Product Price"),
-                            Radio(value="deleteProd", label="Delete A Product"),
-                            Radio(value="addProd", label="Add A Product"),
-                            Radio(value="updateGST", label="Update GST"),
-                        ]
-                    ),
-                    on_change=radiogroup_changed,
+                    "Back", on_click=lambda _: self.page.go("/Home"), width=500
                 ),
-                Container(c, padding=90),
+                Text(value="Settings", size=50),
+                Text(value="Add Products", size=30),
+                Column(add_item, alignment="center"),
+                Text(value="Edit GST", size=30),
+                gst,
+                ElevatedButton("Update GST", on_click=lambda _: Update_Gst()),
             ]
-            
         )
-        # self.page.add(Text("Select your favorite color:"), cg, t)
-        return self.settings
 
-
-# Receipt page
-class Receipt(UserControl):
-    def __init__(self, page: Page):
-        super().__init__()
-        self.page = page
-        pprint(page.data)
-        self.error = ""
-
-    def build(self):
-        self.billingpage = Row(
-            [
-                Container(
-                    content=Text(value="Receipt", color="#FCC8D1", size=50),
-                ),
-                ElevatedButton("Back", on_click=lambda _: self.page.go("/Billing")),
-            ],
-            alignment=MainAxisAlignment.SPACE_BETWEEN,
+        return Container(
+            content=c,
+            alignment=alignment.center,
+            padding=padding.symmetric(vertical=80, horizontal=80),
+            margin=margin.all(50),
+            bgcolor=BG,
+            border_radius=30,
         )
-        return self.billingpage
 
-
-# All pages handler
-def views_handler(page):
+# views handler
+def views_handler(page: Page):
     return {
+        "/": View(
+            route="/",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=True,
+            controls=[Login(page)],
+        ),
         "/Home": View(
             route="/Home",
             horizontal_alignment="center",
@@ -511,22 +423,6 @@ def views_handler(page):
             scroll=True,
             controls=[Menu(page)],
         ),
-        "/": View(
-            route="/",
-            horizontal_alignment="center",
-            vertical_alignment="center",
-            bgcolor="#101010",
-            scroll=True,
-            controls=[Login(page)],
-        ),
-        "/under": View(
-            route="/under",
-            horizontal_alignment="center",
-            vertical_alignment="center",
-            bgcolor="#101010",
-            scroll=True,
-            controls=[Under(page)],
-        ),
         "/Billing": View(
             route="/Billing",
             horizontal_alignment="center",
@@ -534,14 +430,6 @@ def views_handler(page):
             bgcolor="#101010",
             scroll=True,
             controls=[Billing(page)],
-        ),
-        "/Receipt": View(
-            route="/Receipt",
-            horizontal_alignment="center",
-            vertical_alignment="center",
-            bgcolor="#101010",
-            scroll=True,
-            controls=[Receipt(page)],
         ),
         "/Setting": View(
             route="/Setting",
@@ -552,3 +440,23 @@ def views_handler(page):
             controls=[Setting(page)],
         ),
     }
+
+def main(page: Page):
+    page.title = "Cashier App"
+    page.window_width = 600
+    page.window_height = 600
+    page.horizontal_alignment = "center"
+    page.vertical_alignment = "center"
+    page.bgcolor = "#101010"
+    page.update()
+    page.views.append(views_handler(page)["/"])
+
+    def route_change(route):
+        page.views.clear()
+        page.views.append(views_handler(page)[page.route])
+
+    page.on_route_change = route_change
+    page.go(page.route)
+
+
+app(target=main)
