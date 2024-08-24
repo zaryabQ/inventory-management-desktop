@@ -8,7 +8,7 @@ cur = con.cursor()
 BG = "#000000"
 FW = "#ffffff"
 GST = 0.15
-#this is app
+#this is not just an app ammar it's more than that
 # Login page
 class Login(UserControl):
     def __init__(self, page: Page):
