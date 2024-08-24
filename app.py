@@ -1,22 +1,68 @@
-from flet import *
-import flet as ft
-from views import views_handler
 
+from flet import *
+from screens.login import Login
+from screens.home import Home
+from screens.menu import Menu
+from screens.billing import Billing
+from screens.setting import Setting
+
+def views_handler(page: Page):
+    return {
+        "/": View(
+            route="/",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=True,
+            controls=[Login(page)],
+        ),
+        "/Home": View(
+            route="/Home",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=False,
+            controls=[Home(page)],
+        ),
+        "/Menu": View(
+            route="/Menu",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=True,
+            controls=[Menu(page)],
+        ),
+        "/Billing": View(
+            route="/Billing",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=True,
+            controls=[Billing(page)],
+        ),
+        "/Setting": View(
+            route="/Setting",
+            horizontal_alignment="center",
+            vertical_alignment="center",
+            bgcolor="#101010",
+            scroll=True,
+            controls=[Setting(page)],
+        ),
+    }
 
 def main(page: Page):
+    page.title = "Cashier App"
+    page.horizontal_alignment = "center"
+    page.vertical_alignment = "center"
+    page.bgcolor = "#101010"
+    page.update()
+    page.views.append(views_handler(page)["/"])
+
     def route_change(route):
         page.views.clear()
         page.views.append(views_handler(page)[page.route])
 
-    page.title = "My Cashier App"
-    page.horizontal_alignment = "center"
-    page.vertical_alignment = "center"
     page.on_route_change = route_change
-    page.bgcolor = "#101010"
-    page.scroll = True
+    page.go(page.route)
 
-    page.go("/")
-
-
-if __name__ == "__main__":
-    ft.app(target=main)
+app(target=main)
