@@ -8,8 +8,6 @@ def main(page: Page):
         page.views.clear()
         page.views.append(views_handler(page)[page.route])
 
-    #   page.window_min_width = 1000
-    #   page.window_min_height = 1000
     page.title = "My Cashier App"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "center"
