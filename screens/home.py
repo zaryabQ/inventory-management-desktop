@@ -67,7 +67,7 @@ class Home:
                         controls=[
                             Container(
                                 width=200,
-                                height=150,
+                                height=200,
                                 bgcolor="white",
                                 border_radius=10,
                                 content=Column(
@@ -86,7 +86,7 @@ class Home:
                             ),
                             Container(
                                 width=200,
-                                height=150,
+                                height=200,
                                 bgcolor="white",
                                 border_radius=10,
                                 content=Column(
