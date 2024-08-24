@@ -1,8 +1,7 @@
 from flet import *
 
-class Home(UserControl):
+class Home:
     def __init__(self, page: Page):
-        super().__init__()
         self.page = page
         self.page.title = "Dashboard"
         self.page.bgcolor = "#2C2C2C"
@@ -119,3 +118,13 @@ class Home(UserControl):
         )
 
         return layout
+
+def main(page: Page):
+    page.window.width = 800
+    page.window.height = 500
+    page.window.resizable = False
+
+    home = Home(page)
+    page.add(home.build())
+
+app(target=main)
