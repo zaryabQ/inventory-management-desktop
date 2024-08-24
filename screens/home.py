@@ -1,56 +1,121 @@
 from flet import *
-from assets.styles import BG, FW
 
 class Home(UserControl):
     def __init__(self, page: Page):
         super().__init__()
         self.page = page
+        self.page.title = "Dashboard"
+        self.page.bgcolor = "#2C2C2C"
 
     def build(self):
-        self.container = Container(
-            Column(
-                alignment=MainAxisAlignment.CENTER,
-                horizontal_alignment=CrossAxisAlignment.CENTER,
+        # Left side menu bar
+        menu_bar = Container(
+            width=200,
+            bgcolor="#383838",
+            padding=10,
+            content=Column(
                 controls=[
-                    Container(
-                        content=Text(value="Welcome To Icecream Alley", color="#FCC8D1", size=50),
+                    Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
+                    Container(height=20),
+                    ElevatedButton(
+                        on_click=lambda _: self.page.go("/Dashboard"),
+                        text="Dashboard",
+                        bgcolor="#2C2C2C",
+                        color="white",
+                        width=180,
+                        height=50,
                     ),
+                    ElevatedButton(
+                        on_click=lambda _: self.page.go("/Inventory"),
+                        text="Inventory",
+                        bgcolor="#2C2C2C",
+                        color="white",
+                        width=180,
+                        height=50,
+                    ),
+                    ElevatedButton(
+                        on_click=lambda _: self.page.go("/Billing"),
+                        text="Billing",
+                        bgcolor="#2C2C2C",
+                        color="white",
+                        width=180,
+                        height=50,
+                    ),
+                    ElevatedButton(
+                        on_click=lambda _: self.page.go("/Settings"),
+                        text="Settings",
+                        bgcolor="#2C2C2C",
+                        color="white",
+                        width=180,
+                        height=50,
+                    ),
+                ],
+            ),
+        )
+
+        # Right side content
+        content_area = Container(
+            expand=True,
+            bgcolor="#2C2C2C",
+            padding=25,
+            content=Column(
+                horizontal_alignment=CrossAxisAlignment.CENTER,
+                alignment=MainAxisAlignment.CENTER,
+                controls=[
+                    Text(value="Welcome Back", color="#00D0FF", size=40),
                     Row(
                         alignment=MainAxisAlignment.CENTER,
-                        vertical_alignment=CrossAxisAlignment.CENTER,
-                        expand=1,
                         controls=[
-                            ElevatedButton(
-                                on_click=lambda _: self.page.go("/Menu"),
-                                text="Menu",
-                                bgcolor="#FAB3A9",
-                                color="red",
+                            Container(
                                 width=200,
-                                height=100,
+                                height=150,
+                                bgcolor="white",
+                                border_radius=10,
+                                content=Column(
+                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                    alignment=MainAxisAlignment.CENTER,
+                                    controls=[
+                                        Text("Overview", size=18, weight="bold"),
+                                        Text("Total Sales", size=16),
+                                        Text("92", size=16),
+                                        Text("Profit", size=16),
+                                        Text("92", size=16),
+                                        Text("Total Cost", size=16),
+                                        Text("92", size=16),
+                                    ],
+                                ),
                             ),
-                            ElevatedButton(
-                                on_click=lambda _: self.page.go("/Billing"),
-                                text="Billing",
-                                bgcolor="#FAB3A9",
-                                color="red",
+                            Container(
                                 width=200,
-                                height=100,
-                            ),
-                            ElevatedButton(
-                                on_click=lambda _: self.page.go("/Setting"),
-                                text="Settings",
-                                bgcolor="#FAB3A9",
-                                color="red",
-                                width=200,
-                                height=100,
+                                height=150,
+                                bgcolor="white",
+                                border_radius=10,
+                                content=Column(
+                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                    alignment=MainAxisAlignment.CENTER,
+                                    controls=[
+                                        Text("Inventory", size=18, weight="bold"),
+                                        Text("Total Items", size=16),
+                                        Text("92", size=16),
+                                        Text("Low Stock", size=16),
+                                        Text("92", size=16),
+                                        Text("To be Received", size=16),
+                                        Text("92", size=16),
+                                    ],
+                                ),
                             ),
                         ],
                     ),
                 ],
             ),
-            height=600,
-            width=700,
-            padding=25,
-            border_radius=50,
         )
-        return self.container
+
+        # Main layout combining menu bar and content area
+        layout = Row(
+            controls=[
+                menu_bar,
+                content_area,
+            ],
+        )
+
+        return layout
