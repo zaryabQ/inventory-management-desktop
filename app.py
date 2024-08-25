@@ -51,7 +51,7 @@ def views_handler(page: Page):
     }
 
 def main(page: Page):
-    page.title = "Cashier App"
+    page.title = "INVENTORY SYSTEM"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "center"
     page.bgcolor = "#101010"
