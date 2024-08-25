@@ -30,7 +30,7 @@ class Inventory(Control):
             content=Column(
                 expand=True,
                 controls=[
-                    Text("Inventory", color="#00D0FF", size=20, weight="bold"),
+                    Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
                     Container(height=20),
                     self.create_menu_button("Dashboard", "/Dashboard"),
                     Container(height=10),
@@ -57,6 +57,7 @@ class Inventory(Control):
                 vertical_alignment=CrossAxisAlignment.CENTER,  # Align content vertically centered
             ),
         )
+
         # Search bar with Add Item button
         search_bar_row = Row(
             controls=[
@@ -91,17 +92,25 @@ class Inventory(Control):
                 DataColumn(Text("Product Name")),
                 DataColumn(Text("Quantity")),
                 DataColumn(Text("Price")),
-                DataColumn(Text("Update")),
-                DataColumn(Text("Remove")),
+                DataColumn(Text("Actions")),  # Single column for actions
             ],
             rows=[
                 DataRow(
                     cells=[
-                        DataCell(Text(i[1])),  # i[1] for product_name
-                        DataCell(Text(i[2])),  # i[2] for quantity
-                        DataCell(Text(i[3])),  # i[3] for price
-                        DataCell(IconButton(icons.UPDATE, on_click=lambda e, id=i[0]: self.update_item(id))),
-                        DataCell(IconButton(icons.DELETE, on_click=lambda e, id=i[0]: self.remove_item(id))),
+                        DataCell(Text(i[1]), padding=Padding(left=20, right=20)),  # Add padding for spacing
+                        DataCell(Text(i[2]), padding=Padding(left=20, right=20)),  # Add padding for spacing
+                        DataCell(Text(i[3]), padding=Padding(left=20, right=20)),  # Add padding for spacing
+                        DataCell(
+                            Row(
+                                controls=[
+                                    IconButton(icons.UPDATE, on_click=lambda e, id=i[0]: self.update_item(id)),
+                                    Container(width=10),  # Add space between icons
+                                    IconButton(icons.DELETE, on_click=lambda e, id=i[0]: self.remove_item(id)),
+                                ],
+                                alignment=MainAxisAlignment.CENTER,  # Center the icons vertically
+                            ),
+                            padding=Padding(left=20, right=20),  # Add padding for spacing
+                        ),
                     ]
                 )
                 for i in self.inventory
