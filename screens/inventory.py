@@ -53,13 +53,13 @@ def build_inventory(page: Page):
 
     # Left side menu bar
     menu_bar = Container(
-        width=200,
+        width=250,
         bgcolor="#383838",
         padding=10,
         content=Column(
             expand=True,
             controls=[
-                Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
+                Text("Inventory", color="#00D0FF", size=20, weight="bold"),
                 Container(height=20),
                 create_menu_button("Dashboard", "/Dashboard"),
                 Container(height=10),
@@ -74,8 +74,8 @@ def build_inventory(page: Page):
 
     # Header with welcome message
     header = Container(
-        bgcolor="#383838",  # Set the background color of the header container
-        padding=20,  # Optional: Add some padding around the content
+        bgcolor="#2b3037",  # Set the background color of the header container
+        padding=40,  # Optional: Add some padding around the content
         content=Row(
             controls=[
                 Container(
@@ -95,17 +95,18 @@ def build_inventory(page: Page):
                     hint_text="Search Item",
                     on_change=search_item,
                     height=50,
+                    bgcolor="#ffffff",
                     border_radius=10,  # Rounded corners
                 ),
                 width=300,  # Set a fixed width for the search bar
                 padding=10,
             ),
-            Container(width=550),  # Space between search bar and button
+            Container(width=700),  # Space between search bar and button
             Container(
                 content=ElevatedButton(
                     text="Add Item",
                     on_click=add_item,
-                    bgcolor="#E0E0E0",
+                    bgcolor="#2abfbf",
                     color="#000000",
                 ),
                 border_radius=20,  # Rounded corners
@@ -152,6 +153,7 @@ def build_inventory(page: Page):
         controls=[
             menu_bar,  # Ensure menu_bar is included in the Row
             Container(
+                bgcolor="#ffffff",  # Set the background color of the container to white
                 content=Column(
                     controls=[
                         Container(header, padding=10),
@@ -167,12 +169,13 @@ def build_inventory(page: Page):
 
     return layout
 
+
 def main(page: Page):
-    page.title = "Inventory Management"
+    page.title = "Inventory"
     page.bgcolor = "#2C2C2C"
-    page.window_width = 800
-    page.window_height = 500
-    page.window_resizable = True  # Allow window resizing
+    page.window.width = 800
+    page.window.height = 500
+    page.window.resizable = True  # Allow window resizing
 
     inventory_layout = build_inventory(page)
     page.add(inventory_layout)
