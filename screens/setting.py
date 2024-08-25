@@ -2,7 +2,7 @@ from flet import *
 import sqlite3
 from assets.styles import FW
 
-class Setting(UserControl):
+class Setting(Control):
     def __init__(self, page: Page):
         super().__init__()
         self.page = page

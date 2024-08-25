@@ -23,113 +23,95 @@ cur.execute('''
 ''')
 con.commit()
 
-class Login(UserControl):
-    def __init__(self, page: Page):
-        super().__init__()
-        self.page = page
+def build_login(page: Page):
+    # Create the username and password fields
+    name = TextField(
+        label="Username",
+        color=TEXT_COLOR,
+        bgcolor=TEXT_FIELD_BG,
+        border_color=TEXT_COLOR,
+        text_align="center",
+        width=250,
+    )
+    password = TextField(
+        label="Password",
+        password=True,
+        can_reveal_password=True,
+        color=TEXT_COLOR,
+        bgcolor=TEXT_FIELD_BG,
+        border_color=TEXT_COLOR,
+        text_align="center",
+        width=250,
+    )
 
-    def handle_login(self, e):
-        username = self.name.value
-        password_value = self.password.value
-
-        res = cur.execute(
-            '''SELECT * FROM Users WHERE username = ? AND password = ?''',
-            (username, password_value)
-        )
-        users = res.fetchall()
-        if users:
-            self.page.go("/Home")
-        else:
-            print("Error! Invalid credentials")
-
-    def build_login(self):
-        # Create the username and password fields
-        self.name = TextField(
-            label="Username",
+    # Create the login button
+    login_button = ElevatedButton(
+        text="Login",
+        on_click=lambda e: handle_login(page, name, password),
+        width=120,
+        style=ButtonStyle(
             color=TEXT_COLOR,
-            bgcolor=TEXT_FIELD_BG,
-            border_color=TEXT_COLOR,
-            text_align="center",
-            width=250,
+            bgcolor=LOGIN_BUTTON_COLOR
         )
-        self.password = TextField(
-            label="Password",
-            password=True,
-            can_reveal_password=True,
-            color=TEXT_COLOR,
-            bgcolor=TEXT_FIELD_BG,
-            border_color=TEXT_COLOR,
-            text_align="center",
-            width=250,
-        )
+    )
 
-        # Create the login button
-        login_button = ElevatedButton(
-            text="Login",
-            on_click=self.handle_login,
-            width=120,
-            style=ButtonStyle(
-                color=TEXT_COLOR,
-                bgcolor=LOGIN_BUTTON_COLOR
-            )
-        )
+    # Create the logo
+    logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=TEXT_COLOR)
 
-        # Create the logo
-        logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=TEXT_COLOR)
+    # Create the right side layout
+    right_side = Column(
+        [
+            logo,
+            Container(height=20),  # Spacer
+            name,
+            password,
+            Container(height=20),  # Spacer
+            login_button
+        ],
+        alignment=MainAxisAlignment.CENTER,
+        horizontal_alignment=CrossAxisAlignment.CENTER,
+        expand=True
+    )
 
-        # Create the right side layout
-        right_side = Column(
-            [
-                logo,
-                Container(height=20),  # Spacer
-                self.name,
-                self.password,
-                Container(height=20),  # Spacer
-                login_button
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            horizontal_alignment=CrossAxisAlignment.CENTER,
-            expand=True
-        )
+    return right_side
 
-        return right_side
-
-    def build(self):
-        left_side = Container(
-            bgcolor=LEFT_BG,
-            expand=7,  # Takes 70% width
-           # height=1,  # Takes full height of the parent container
-            content=Image(
-                src="png/person-with-solar-panel.jpg",  # Ensure the image is in your assets or provide the correct path
-                fit=ImageFit.COVER,
-                expand=True
-            )
-        )
-
-        right_side_container = Container(
-            content=self.build_login(),
-            bgcolor=BG,
-            expand = 3,  # Takes 30% width
-           # height=1,  # Takes full height of the parent container
-        )
-
-        main_layout = Row(
-            [
-                left_side,
-                right_side_container
-            ],
-            alignment=MainAxisAlignment.CENTER,  # Ensure the containers fill the available space
-            expand=True
-        )
-
-        return main_layout
+def handle_login(page: Page, name, password):
+    print("none")
+    #page.go("/Home")
+    # Add your login logic here
+    # e.g., Check username and password against the database
 
 def main(page: Page):
     page.title = "Login"
     
+    left_side = Container(
+        bgcolor=LEFT_BG,
+        expand=7,  # Takes 70% width
+        content=Image(
+            src="png/person-with-solar-panel.jpg",  # Ensure the image is in your assets or provide the correct path
+            fit=ImageFit.COVER,
+            expand=True
+        )
+    )
+
+    right_side_container = Container(
+        content=build_login(page),
+        bgcolor=BG,
+        expand=3,  # Takes 30% width
+    )
+
+    main_layout = Row(
+        [
+            left_side,
+            right_side_container
+        ],
+        alignment=MainAxisAlignment.CENTER,  # Ensure the containers fill the available space
+        expand=True
+    )
+
     # Create a container that expands to fill the whole window
     full_page_container = Container(
-        content=Login(page),
+        content=main_layout,
         expand=True
     )
 
