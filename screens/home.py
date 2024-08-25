@@ -13,45 +13,61 @@ class Home:
             bgcolor="#383838",
             padding=10,
             content=Column(
+                expand=True,
                 controls=[
                     Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
                     Container(height=20),
-                    ElevatedButton(
-                        on_click=lambda _: self.page.go("/Dashboard"),
-                        text="Dashboard",
-                        bgcolor="#2C2C2C",
-                        color="white",
+                    Container(
                         width=180,
                         height=50,
+                        margin=margin.only(bottom=10),
+                        content=ElevatedButton(
+                            on_click=lambda _: self.page.go("/Dashboard"),
+                            text="Dashboard",
+                            bgcolor="#2C2C2C",
+                            color="white",
+                            expand=True,
+                        ),
                     ),
-                    ElevatedButton(
-                        on_click=lambda _: self.page.go("/Inventory"),
-                        text="Inventory",
-                        bgcolor="#2C2C2C",
-                        color="white",
+                    Container(
                         width=180,
                         height=50,
+                        margin=margin.only(bottom=10),
+                        content=ElevatedButton(
+                            on_click=lambda _: self.page.go("/Inventory"),
+                            text="Inventory",
+                            bgcolor="#2C2C2C",
+                            color="white",
+                            expand=True,
+                        ),
                     ),
-                    ElevatedButton(
-                        on_click=lambda _: self.page.go("/Billing"),
-                        text="Billing",
-                        bgcolor="#2C2C2C",
-                        color="white",
+                    Container(
                         width=180,
                         height=50,
+                        margin=margin.only(bottom=10),
+                        content=ElevatedButton(
+                            on_click=lambda _: self.page.go("/Billing"),
+                            text="Billing",
+                            bgcolor="#2C2C2C",
+                            color="white",
+                            expand=True,
+                        ),
                     ),
-                    ElevatedButton(
-                        on_click=lambda _: self.page.go("/Settings"),
-                        text="Settings",
-                        bgcolor="#2C2C2C",
-                        color="white",
+                    Container(
                         width=180,
                         height=50,
+                        margin=margin.only(bottom=10),
+                        content=ElevatedButton(
+                            on_click=lambda _: self.page.go("/Settings"),
+                            text="Settings",
+                            bgcolor="#2C2C2C",
+                            color="white",
+                            expand=True,
+                        ),
                     ),
                 ],
             ),
         )
-
         # Right side content
         content_area = Container(
             expand=True,
@@ -60,19 +76,22 @@ class Home:
             content=Column(
                 horizontal_alignment=CrossAxisAlignment.CENTER,
                 alignment=MainAxisAlignment.CENTER,
+                expand=True,
                 controls=[
                     Text(value="Welcome Back", color="#00D0FF", size=40),
                     Row(
                         alignment=MainAxisAlignment.CENTER,
+                        expand=True,
                         controls=[
                             Container(
-                                width=200,
-                                height=200,
+                                expand=True,  # Expand box according to available space
                                 bgcolor="white",
                                 border_radius=10,
+                                padding=10,
                                 content=Column(
                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                     alignment=MainAxisAlignment.CENTER,
+                                    expand=True,
                                     controls=[
                                         Text("Overview", size=18, weight="bold"),
                                         Text("Total Sales", size=16),
@@ -85,13 +104,14 @@ class Home:
                                 ),
                             ),
                             Container(
-                                width=200,
-                                height=200,
+                                expand=True,  # Expand box according to available space
                                 bgcolor="white",
                                 border_radius=10,
+                                padding=10,
                                 content=Column(
                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                     alignment=MainAxisAlignment.CENTER,
+                                    expand=True,
                                     controls=[
                                         Text("Inventory", size=18, weight="bold"),
                                         Text("Total Items", size=16),
@@ -111,6 +131,7 @@ class Home:
 
         # Main layout combining menu bar and content area
         layout = Row(
+            expand=True,
             controls=[
                 menu_bar,
                 content_area,
@@ -120,9 +141,10 @@ class Home:
         return layout
 
 def main(page: Page):
+    # Use updated properties for window configuration
     page.window.width = 800
     page.window.height = 500
-    page.window.resizable = False
+    page.window.resizable = True  # Allow window resizing
 
     home = Home(page)
     page.add(home.build())
