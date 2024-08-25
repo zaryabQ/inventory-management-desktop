@@ -1,7 +1,8 @@
 from flet import *
 
-class Home:
+class Home(UserControl):
     def __init__(self, page: Page):
+        super().__init__()
         self.page = page
         self.page.title = "Dashboard"
         self.page.bgcolor = "#2C2C2C"

@@ -2,7 +2,7 @@
 from flet import *
 from screens.login import Login
 from screens.home import Home
-from screens.menu import Menu
+from screens.menu import Inventory
 from screens.billing import Billing
 from screens.setting import Setting
 
@@ -30,7 +30,7 @@ def views_handler(page: Page):
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=True,
-            controls=[Menu(page)],
+            controls=[Inventory(page)],
         ),
         "/Billing": View(
             route="/Billing",

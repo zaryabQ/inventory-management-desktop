@@ -1,7 +1,7 @@
 from flet import *
 import sqlite3
 
-class Inventory(Control):
+class Inventory(UserControl):
     def __init__(self, page: Page):
         super().__init__()
         self.page = page
