@@ -125,7 +125,7 @@ class Login(UserControl):
         return main_layout
 
 def main(page: Page):
-    page.title = "Cashier App"
+    page.title = "Login"
     
     # Create a container that expands to fill the whole window
     full_page_container = Container(

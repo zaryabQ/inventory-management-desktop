@@ -30,7 +30,7 @@ class Inventory(Control):
             content=Column(
                 expand=True,
                 controls=[
-                    Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
+                    Text("Inventory", color="#00D0FF", size=20, weight="bold"),
                     Container(height=20),
                     self.create_menu_button("Dashboard", "/Dashboard"),
                     Container(height=10),
