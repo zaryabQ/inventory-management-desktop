@@ -77,7 +77,7 @@ def build_login(page: Page):
 
 def handle_login(page: Page, name, password):
     print("none")
-    #page.go("/Home")
+    page.go("/Home")
     # Add your login logic here
     # e.g., Check username and password against the database
 

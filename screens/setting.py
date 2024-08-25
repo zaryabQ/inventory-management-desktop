@@ -1,64 +1,81 @@
 from flet import *
-import sqlite3
-
-# Define colors
-TEXT_COLOR = colors.BLACK
-LABEL_COLOR = colors.BLACK
-BG = colors.BLUE_GREY_800
-LEFT_BG = colors.BLUE_GREY_900
-LOGIN_BUTTON_COLOR = colors.TEAL_ACCENT_700
-TEXT_FIELD_BG = '#FFFFFF'
-
-# Set up SQLite connection
-con = sqlite3.connect('db/sql.db', check_same_thread=False)
-cur = con.cursor()
-
-# Create the users table if it doesn't exist
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS Users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT
-    )
-''')
-con.commit()
 
 def build_setting(page: Page):
-    # Create a dummy container for content
-    content = Column(
-        controls=[
-            Text("This is the Settings Screen", size=30, color=TEXT_COLOR),
-            Container(height=20),  # Spacer
-            ElevatedButton(
-                text="Back to Home",
-                on_click=lambda e: page.go("/Home"),
-                width=120,
-                bgcolor=LOGIN_BUTTON_COLOR,
-                color=TEXT_COLOR
-            )
+    # Sidebar
+    sidebar = Container(
+        width=200,
+        bgcolor="#2b3037",
+        padding=Padding(10, 50, 10, 10),
+        content=Column(
+            [
+                TextButton("Dashboard", on_click=lambda _: page.go("/Home"), style=ButtonStyle(color="#ffffff")),
+                TextButton("Inventory", on_click=lambda _: page.go("/Menu"), style=ButtonStyle(color="#ffffff")),
+                TextButton("Billing", on_click=lambda _: page.go("/Billing"), style=ButtonStyle(color="#ffffff")),
+                TextButton("Settings", style=ButtonStyle(color="#2abfbf")),
+            ],
+            alignment=MainAxisAlignment.CENTER,
+        ),
+    )
+
+    # Header
+    header = Text("Settings", size=24, color="#2abfbf", weight=FontWeight.BOLD)
+
+    # Input fields and buttons
+    input_fields = Container(
+        padding=20,
+        width=500,
+        height=300,
+        bgcolor="#2b3037",
+        border_radius=10,
+        content=Column(
+            [
+                TextField(label="New Username", bgcolor="#3b414a", color="#d9d9d9", border_radius=8),
+                Row(
+                    [
+                        TextField(label="Old Password", bgcolor="#3b414a", color="#d9d9d9", border_radius=8, password=True),
+                        TextField(label="New Password", bgcolor="#3b414a", color="#d9d9d9", border_radius=8, password=True),
+                    ],
+                    spacing=10,
+                ),
+                Row(
+                    [
+                        ElevatedButton("Update Username", bgcolor="#2abfbf", color="#ffffff", width=150),
+                        ElevatedButton("Update Password", bgcolor="#2abfbf", color="#ffffff", width=150),
+                    ],
+                    alignment=MainAxisAlignment.END,
+                ),
+            ],
+            spacing=15,
+        ),
+    )
+
+    # Back button
+    back_button = ElevatedButton("Back", bgcolor="#2abfbf", color="#ffffff", on_click=lambda _: page.go("/Home"))
+
+    # Page layout
+    return Row(
+        [
+            sidebar,
+            VerticalDivider(width=1, color="#2abfbf"),
+            Column(
+                [
+                    header,
+                    input_fields,
+                    Container(content=back_button, alignment=alignment.center_right, padding=20),
+                ],
+                spacing=20,
+                alignment=MainAxisAlignment.START,
+                width=800,
+            ),
         ],
-        alignment=MainAxisAlignment.CENTER,
-        horizontal_alignment=CrossAxisAlignment.CENTER
-    )
-
-    # Create a full-size container
-    full_size_container = Container(
-        content=content,
         expand=True,
-        bgcolor=BG
     )
-
-    return full_size_container
 
 def main(page: Page):
     page.title = "Settings"
+    page.bgcolor = "#121a26"  # Background color
 
-    # Create the full page layout
-    full_page_container = Container(
-        content=build_setting(page),
-        expand=True
-    )
-
-    page.add(full_page_container)
+    # Add the Setting screen to the page
+    page.add(build_setting(page))
 
 app(target=main)

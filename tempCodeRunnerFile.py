@@ -1,1 +1,0 @@
-from assets.views import views_handler
