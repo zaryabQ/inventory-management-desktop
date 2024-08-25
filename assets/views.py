@@ -1,10 +1,9 @@
 from flet import *
-from screens.login import Login
-from screens.home import Home
-from screens.menu import Inventory
-from screens.billing import Billing
-from screens.setting import Setting
-
+from screens.login import build_login
+from screens.home import build_home
+from screens.inventory import build_inventory
+from screens.billing import build_billing
+from screens.setting import build_setting
 
 def views_handler(page: Page):
     return {
@@ -14,7 +13,7 @@ def views_handler(page: Page):
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=True,
-            controls=[Login(page)],
+            controls=[build_login(page)],
         ),
         "/Home": View(
             route="/Home",
@@ -22,15 +21,15 @@ def views_handler(page: Page):
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=False,
-            controls=[Home(page)],
+            controls=[build_home(page)],
         ),
-        "/Menu": View(
-            route="/Menu",
+        "/Inventory": View(
+            route="/Inventory",
             horizontal_alignment="center",
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=True,
-            controls=[Inventory(page)],
+            controls=[build_inventory(page)],
         ),
         "/Billing": View(
             route="/Billing",
@@ -38,7 +37,7 @@ def views_handler(page: Page):
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=True,
-            controls=[Billing(page)],
+            controls=[build_billing(page)],
         ),
         "/Setting": View(
             route="/Setting",
@@ -46,6 +45,6 @@ def views_handler(page: Page):
             vertical_alignment="center",
             bgcolor="#101010",
             scroll=True,
-            controls=[Setting(page)],
+            controls=[build_setting(page)],
         ),
     }

@@ -1,6 +1,10 @@
 from flet import *
-from screens.setting import Setting
-from assets.views import views_handler
+from screens.login import build_login
+from screens.home import build_home
+from screens.inventory import build_inventory
+from screens.billing import build_billing
+from screens.setting import build_setting
+#from assets.views import views_handler
 
 def main(page: Page):
     page.title = "INVENTORY SYSTEM"
