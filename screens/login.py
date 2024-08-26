@@ -7,7 +7,7 @@ LABEL_COLOR = colors.BLACK
 BG = colors.BLUE_GREY_800
 LEFT_BG = colors.BLUE_GREY_900
 LOGIN_BUTTON_COLOR = colors.TEAL_ACCENT_700
-TEXT_FIELD_BG = '#FFFFFF'
+TEXT_FIELD_BG = '#fffff'
 
 # Set up SQLite connection
 con = sqlite3.connect('db/sql.db', check_same_thread=False)

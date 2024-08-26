@@ -34,7 +34,7 @@ def main(page: Page):
     page.on_close = on_window_close
 
     # Navigate to the initial route
-    page.go("/Home")
+    page.go("/login")
     print(page.route)
 
 app(target=main)
