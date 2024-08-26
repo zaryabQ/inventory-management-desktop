@@ -4,9 +4,9 @@ import sqlite3
 def build_billing(page: Page):
     FW = colors.CYAN  # Define FW color manually here
 
-    def close_add_dlg(e):
-        add_dlg.open = False
-        page.update()
+    # def close_add_dlg(e):
+    #     add_dlg.open = False
+    #     page.update()
 
     def handle_add_bill(e):
         # Logic to add bill (You can implement SQLite logic here)
