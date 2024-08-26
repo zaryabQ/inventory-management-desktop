@@ -158,7 +158,6 @@ def build_setting(page: Page):
         ),
     )
 
-    # Back button
     back_button = ElevatedButton("Back", bgcolor="#2abfbf", width=100, color="#ffffff", on_click=lambda _: page.go("/dashboard"))
 
     # Page layout
@@ -178,7 +177,11 @@ def build_setting(page: Page):
                     ),
                     Row(
                         controls=[
-                            Container(content=back_button, padding=Padding(left=470, right=0, top=0, bottom=20))
+                            Container(
+                                content=back_button,
+                                alignment=alignment.center,  # Center align button within Container
+                                padding=Padding(left=0, right=0, top=0, bottom=20)
+                            )
                         ],
                         alignment=MainAxisAlignment.CENTER,
                         expand=True,
