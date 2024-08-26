@@ -1,7 +1,7 @@
+import flet as ft
 from flet import *
 import sqlite3
 
-# Define colors
 TEXT_COLOR = colors.BLACK
 LABEL_COLOR = colors.BLACK
 BG = colors.BLUE_GREY_800
@@ -23,98 +23,89 @@ cur.execute('''
 ''')
 con.commit()
 
-def build_login(page: Page):
-    # Create the username and password fields
-    name = TextField(
-        label="Username",
-        color=TEXT_COLOR,
-        bgcolor=TEXT_FIELD_BG,
-        border_color=TEXT_COLOR,
-        text_align="center",
-        width=250,
-    )
-    password = TextField(
-        label="Password",
-        password=True,
-        can_reveal_password=True,
-        color=TEXT_COLOR,
-        bgcolor=TEXT_FIELD_BG,
-        border_color=TEXT_COLOR,
-        text_align="center",
-        width=250,
-    )
+class LoginScreen:
 
-    # Create the login button
-    login_button = ElevatedButton(
-        text="Login",
-        on_click=lambda e: handle_login(page, name, password),
-        width=120,
-        style=ButtonStyle(
+    def __init__(self, page: Page):
+        self.page = page
+
+    def handle_login(self,name,password):
+
+        self.page.go("/Home")
+
+
+    def build(self):
+        name = TextField(
+            label="Username",
             color=TEXT_COLOR,
-            bgcolor=LOGIN_BUTTON_COLOR
+            bgcolor=TEXT_FIELD_BG,
+            border_color=TEXT_COLOR,
+            text_align="center",
+            width=250,
         )
-    )
-
-    # Create the logo
-    logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=TEXT_COLOR)
-
-    # Create the right side layout
-    right_side = Column(
-        [
-            logo,
-            Container(height=20),  # Spacer
-            name,
-            password,
-            Container(height=20),  # Spacer
-            login_button
-        ],
-        alignment=MainAxisAlignment.CENTER,
-        horizontal_alignment=CrossAxisAlignment.CENTER,
-        expand=True
-    )
-
-    return right_side
-
-def handle_login(page: Page, name, password):
-    print("none")
-    page.go("/Home")
-    # Add your login logic here
-    # e.g., Check username and password against the database
-
-def main(page: Page):
-    page.title = "Login"
-    
-    left_side = Container(
-        bgcolor=LEFT_BG,
-        expand=7,  # Takes 70% width
-        content=Image(
-            src="png/person-with-solar-panel.jpg",  # Ensure the image is in your assets or provide the correct path
-            fit=ImageFit.COVER,
-            expand=True
+        password = TextField(
+            label="Password",
+            password=True,
+            can_reveal_password=True,
+            color=TEXT_COLOR,
+            bgcolor=TEXT_FIELD_BG,
+            border_color=TEXT_COLOR,
+            text_align="center",
+            width=250,
         )
-    )
 
-    right_side_container = Container(
-        content=build_login(page),
-        bgcolor=BG,
-        expand=3,  # Takes 30% width
-    )
+        # Create the login button
+        login_button = ElevatedButton(
+            text="Login",
+            on_click=lambda e: self.handle_login(name, password),
+            width=120,
+            style=ButtonStyle(
+                color=TEXT_COLOR,
+                bgcolor=LOGIN_BUTTON_COLOR
+            )
+        )
+        logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=TEXT_COLOR)
 
-    main_layout = Row(
-        [
-            left_side,
-            right_side_container
-        ],
-        alignment=MainAxisAlignment.CENTER,  # Ensure the containers fill the available space
-        expand=True
-    )
+        left_side = Container(
+            bgcolor=colors.BLUE_GREY_900,
+            expand=7,  # Takes 70% width
+            content=Image(
+                src="png/person-with-solar-panel.jpg",  # Ensure the image is in your assets or provide the correct path
+                fit=ImageFit.COVER,
+                expand=True
+            )
+        )
 
-    # Create a container that expands to fill the whole window
-    full_page_container = Container(
-        content=main_layout,
-        expand=True
-    )
+        right_side_container = Container(
+            content=Column(
+                [
+                    logo,
+                    Container(height=20),  # Spacer
+                    name,
+                    password,
+                    Container(height=20),  # Spacer
+                    login_button
+                ],
+                alignment=MainAxisAlignment.CENTER,
+                horizontal_alignment=CrossAxisAlignment.CENTER,
+                expand=True
+            ),
+            bgcolor=BG,
+            expand=3,  
+        )
 
-    page.add(full_page_container)
+        fullsize = Container(
+            content=Row(
+                [
+                    left_side,
+                    right_side_container
+                ],
+                alignment=MainAxisAlignment.CENTER,  # Ensure the containers fill the available space
+                expand=True
+            ),
+            alignment= alignment.center,
+            width=self.page.width,
+            height=self.page.height
 
-app(target=main)
+        )
+
+        return fullsize
