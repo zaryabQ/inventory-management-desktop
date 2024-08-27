@@ -7,7 +7,6 @@ LABEL_COLOR = colors.BLACK
 BG = colors.BLUE_GREY_800
 LEFT_BG = colors.BLUE_GREY_900
 LOGIN_BUTTON_COLOR = colors.TEAL_ACCENT_700
-TEXT_FIELD_BG = '#fffff'
 
 # Set up SQLite connection
 con = sqlite3.connect('db/sql.db', check_same_thread=False)
@@ -28,16 +27,14 @@ class LoginScreen:
     def __init__(self, page: Page):
         self.page = page
 
-    def handle_login(self,name,password):
-
+    def handle_login(self, name, password):
         self.page.go("/Home")
-
 
     def build(self):
         name = TextField(
             label="Username",
             color=TEXT_COLOR,
-            bgcolor=TEXT_FIELD_BG,
+            bgcolor='#ffffff',
             border_color=TEXT_COLOR,
             text_align="center",
             width=250,
@@ -47,7 +44,7 @@ class LoginScreen:
             password=True,
             can_reveal_password=True,
             color=TEXT_COLOR,
-            bgcolor=TEXT_FIELD_BG,
+            bgcolor='#ffffff',
             border_color=TEXT_COLOR,
             text_align="center",
             width=250,
@@ -65,47 +62,47 @@ class LoginScreen:
         )
         logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=TEXT_COLOR)
 
+        # Container for the left side with image
         left_side = Container(
-            bgcolor=colors.BLUE_GREY_900,
-            expand=7,  # Takes 70% width
+            bgcolor=LEFT_BG,
             content=Image(
-                src="png/person-with-solar-panel.jpg",  # Ensure the image is in your assets or provide the correct path
-                fit=ImageFit.COVER,
-                expand=True
-            )
+                src="png/mariana-proenca-_h0xG4s6NFg-unsplash.jpg",  # Adjust the path to the image
+                fit=ImageFit.COVER,   # Ensure the image covers the container
+                expand=True  # Ensure the image expands to fill the container
+            ),
+            expand=True,  # Take full available height and width
+            width=500,  # Ensure the container has a defined width
+            height=1000,  # Ensure the container has a defined height
         )
 
-        right_side_container = Container(
-            content=Column(
-                [
-                    logo,
-                    Container(height=20),  # Spacer
-                    name,
-                    password,
-                    Container(height=20),  # Spacer
-                    login_button
-                ],
-                alignment=MainAxisAlignment.CENTER,
-                horizontal_alignment=CrossAxisAlignment.CENTER,
-                expand=True
-            ),
-            bgcolor=BG,
-            expand=3,  
-        )
+        right_side_container = ft.Container(
+    content=ft.Column(
+        [
+            logo,
+            ft.Container(height=80),  # Spacer
+            name,
+            password,
+            ft.Container(height=30),  # Spacer
+            login_button
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        expand=True
+    ),
+    bgcolor=BG,
+    width=480,  # Set a fixed width for the right side
+    expand=False,  # Do not expand beyond its set width
+    border=ft.border.all(2, ft.colors.WHITE)  # Add a border with a thickness of 2 and color white
+)
 
-        fullsize = Container(
-            content=Row(
-                [
-                    left_side,
-                    right_side_container
-                ],
-                alignment=MainAxisAlignment.CENTER,  # Ensure the containers fill the available space
-                expand=True
-            ),
-            alignment= alignment.center,
-            width=self.page.width,
-            height=self.page.height
 
+        fullsize = Row(
+            controls=[
+                left_side,
+                right_side_container
+            ],
+            expand=True,
+            alignment=MainAxisAlignment.SPACE_BETWEEN  # Distribute space between left and right sides
         )
 
         return fullsize

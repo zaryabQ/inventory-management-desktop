@@ -1,32 +1,36 @@
 import flet as ft
 from flet import *
+
 TEXT_COLOR = colors.BLACK
+
 class SettingsScreen:
     def __init__(self, page: Page):
         self.page = page
 
-    def create_menu_button(self, text: str, route: str) -> TextButton:
+    def create_menu_button(self, text, route):
         """Helper function to create menu buttons."""
-        return TextButton(
-            content=Text(text, size=20, weight=FontWeight.BOLD, color=TEXT_COLOR),
-            on_click=lambda _: self.page.go(route),
-            style=ButtonStyle(
-                bgcolor="#2b3037",  # Background color for the button
-                shape=RoundedRectangleBorder(radius=8),
-                padding=Padding(left=10, right=15, top=10, bottom=10),
+        return Container(
+            width=180,
+            height=50,
+            margin=margin.only(bottom=10),
+            content=ElevatedButton(
+                text=text,
+                on_click=lambda _: self.page.go(route),
+                bgcolor="#2C2C2C",
+                color="white",
+                expand=True,
             ),
         )
-
     def build(self):
         # Sidebar
         sidebar = Container(
-            width=200,
+            width=250,
             bgcolor="#383838",
             padding=10,
             content=Column(
                 expand=True,
                 controls=[
-                    Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
+                    Text("Setting", color="#00D0FF", size=20, weight="bold"),
                     Container(height=20),
                     self.create_menu_button("Dashboard", "/Home"),
                     Container(height=10),
@@ -41,6 +45,7 @@ class SettingsScreen:
 
         # Header with welcome message
         header = Container(
+            bgcolor="#2b3037",
             padding=0,
             content=Row(
                 controls=[
@@ -51,9 +56,11 @@ class SettingsScreen:
                 ],
                 alignment=MainAxisAlignment.CENTER,
                 vertical_alignment=CrossAxisAlignment.CENTER,
+                
                 expand=True,
             ),
             expand=True,
+            border=ft.border.all(2, ft.colors.WHITE)
         )
 
         # Input fields and buttons
@@ -61,7 +68,7 @@ class SettingsScreen:
             padding=Padding(20, 20, 20, 20),
             width=1000,
             height=250,
-            bgcolor="#2b3037",
+            bgcolor="#383838",  # Keeping the input fields container's background color different
             border_radius=10,
             content=Column(
                 controls=[
@@ -75,6 +82,8 @@ class SettingsScreen:
                             height=50,
                         ),
                     ),
+                    # Adding some vertical space before password fields
+                    Container(height=20),  # Adjust the height to move the fields down
                     Row(
                         controls=[
                             Container(
@@ -108,13 +117,14 @@ class SettingsScreen:
             ),
         )
 
+
         # Update buttons
         update_buttons = Container(
             padding=Padding(0, 0, 0, 40),
             content=Column(
                 [
-                    ElevatedButton("Update", bgcolor="#2abfbf", color="#ffffff", width=100),
-                    ElevatedButton("Update", bgcolor="#2abfbf", color="#ffffff", width=100),
+                    ElevatedButton("Update", bgcolor="#2abfbf", color="#000000", width=100),
+                    ElevatedButton("Update", bgcolor="#2abfbf", color="#000000", width=100),
                 ],
                 spacing=80,
                 alignment=MainAxisAlignment.START,
@@ -122,44 +132,46 @@ class SettingsScreen:
         )
 
         # Back button
-        back_button = ElevatedButton("Back", bgcolor="#2abfbf", width=100, color="#ffffff", on_click=lambda _: self.page.go("/Dashboard"))
+        back_button = ElevatedButton("Back", bgcolor="#2abfbf", width=100, color="#000000", on_click=lambda _: self.page.go("/Dashboard"))
 
         # Page layout
-        layout = Row(
-            controls=[
-                sidebar,
-                VerticalDivider(width=1, color="#2abfbf"),
-                Column(
-                    controls=[
-                        header,
-                        Row(
-                            controls=[
-                                input_fields,
-                                update_buttons,
-                            ],
-                            alignment=MainAxisAlignment.START,
-                        ),
-                        Row(
-                            controls=[
-                                Container(
-                                    content=back_button,
-                                    alignment=alignment.center,
-                                    padding=Padding(left=0, right=0, top=0, bottom=20)
-                                )
-                            ],
-                            alignment=MainAxisAlignment.CENTER,
-                            expand=True,
-                        ),
-                    ],
-                    spacing=20,
-                    alignment=MainAxisAlignment.START,
-                    width=800,
-                    expand=True,
-                ),
-            ],
+        layout = Container(
+            bgcolor="#2b3037",  # Background color for the right side container
             expand=True,
+            content=Row(
+                controls=[
+                    sidebar,
+                    VerticalDivider(width=1, color="#2abfbf"),
+                    Column(
+                        controls=[
+                            header,
+                            Row(
+                                controls=[
+                                    input_fields,
+                                    update_buttons,
+                                ],
+                                alignment=MainAxisAlignment.START,
+                            ),
+                            Row(
+                                controls=[
+                                    Container(
+                                        content=back_button,
+                                        alignment=alignment.center,
+                                        padding=Padding(left=0, right=0, top=0, bottom=20)
+                                    )
+                                ],
+                                alignment=MainAxisAlignment.CENTER,
+                                expand=True,
+                            ),
+                        ],
+                        spacing=20,
+                        alignment=MainAxisAlignment.START,
+                        width=800,
+                        expand=True,
+                    ),
+                ],
+                expand=True,
+            )
         )
 
         return layout
-
-

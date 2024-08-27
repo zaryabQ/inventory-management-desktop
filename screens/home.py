@@ -8,7 +8,7 @@ class HomeScreen:
     def build(self):
         # Left side menu bar
         menu_bar = Container(
-            width=200,
+            width=250,
             bgcolor="#383838",
             padding=10,
             content=Column(
@@ -19,7 +19,7 @@ class HomeScreen:
                     Container(
                         width=180,
                         height=50,
-                        margin=margin.only(bottom=10),
+                        margin=margin.only(bottom=30),
                         content=ElevatedButton(
                             on_click=lambda _: self.page.go("/Home"),
                             text="Dashboard",
@@ -31,7 +31,7 @@ class HomeScreen:
                     Container(
                         width=180,
                         height=50,
-                        margin=margin.only(bottom=10),
+                        margin=margin.only(bottom=30),
                         content=ElevatedButton(
                             on_click=lambda _: self.page.go("/Inventory"),
                             text="Inventory",
@@ -43,7 +43,7 @@ class HomeScreen:
                     Container(
                         width=180,
                         height=50,
-                        margin=margin.only(bottom=10),
+                        margin=margin.only(bottom=30),
                         content=ElevatedButton(
                             on_click=lambda _: self.page.go("/Billing"),
                             text="Billing",
@@ -55,7 +55,7 @@ class HomeScreen:
                     Container(
                         width=180,
                         height=50,
-                        margin=margin.only(bottom=10),
+                        margin=margin.only(bottom=30),
                         content=ElevatedButton(
                             on_click=lambda _: self.page.go("/Settings"),
                             text="Settings",
@@ -102,6 +102,7 @@ class HomeScreen:
                                         Text("92", size=16),
                                     ],
                                 ),
+                                
                             ),
                             Container(
                                 expand=True,  # Expand box according to available space
