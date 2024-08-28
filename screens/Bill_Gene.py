@@ -1,26 +1,29 @@
 import flet as ft
 
 def main(page: ft.Page):
+    global items
     # Set the custom scrollbar theme
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
             track_color={
-                ft.MaterialState.HOVERED: ft.colors.AMBER,
-                ft.MaterialState.DEFAULT: ft.colors.TRANSPARENT,
+                ft.MaterialState.HOVERED: "#D3D3D3",  
+                ft.MaterialState.DEFAULT: "#FFFFFF",  # White background normally
             },
             track_visibility=True,
-            track_border_color=ft.colors.BLUE,
+            track_border_color="#D3D3D3",            # Light grey border for the track
             thumb_visibility=True,
             thumb_color={
-                ft.MaterialState.HOVERED: ft.colors.GREY,
-                ft.MaterialState.DEFAULT: ft.colors.GREY_300,
+                ft.MaterialState.HOVERED: "#A9A9A9",  # Dark grey thumb on hover (hex for dark grey)
+                ft.MaterialState.DEFAULT: "#696969",  # Dark grey thumb normally (slightly darker)
             },
-            thickness=10,  # Decreased scrollbar width
-            radius=15,
-            main_axis_margin=50,  # Increased margin to move scrollbar further right
-            cross_axis_margin=10,
+            thickness=10,  # Scrollbar width
+            radius=10,     # Scrollbar corner radius
+            main_axis_margin=50,  # Margin from the main axis
+            cross_axis_margin=10,  # Margin from the cross axis
         )
     )
+
+
 
     page.title = "Generate Bill"
     page.bgcolor = "#263238"
@@ -43,48 +46,57 @@ def main(page: ft.Page):
         item_name = ft.Text("New Item", width=150, color="#000000", text_align=ft.TextAlign.CENTER)
         item_price = ft.Text("0", width=100, color="#000000", text_align=ft.TextAlign.CENTER)
 
+        # Create a unique ID for each item
+        item_id = len(items)
         # Add new row to items list
         items.append(
-            ft.Container(
-                content=ft.Row(
-                    controls=[
-                        item_name,
-                        item_price,
-                        ft.IconButton(
-                            icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
-                            icon_color="#000000",
-                            tooltip="Update",
-                            on_click=lambda e, item=item_name: update_item(e, item)
-                        ),
-                        ft.IconButton(
-                            icon=ft.icons.DELETE_OUTLINE_ROUNDED,
-                            icon_color="#000000",
-                            tooltip="Delete",
-                            on_click=lambda e, id=len(items) - 1: remove_item(e, id)
-                        ),
-                    ],
-                    spacing=10,
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                bgcolor="#FFFFFF",
-                padding=ft.padding.all(4),
-                border_radius=ft.border_radius.all(8),
-                margin=ft.margin.symmetric(vertical=3),
-            )
+            {
+                "id": item_id,
+                "container": ft.Container(
+                    content=ft.Row(
+                        controls=[
+                            item_name,
+                            item_price,
+                            ft.IconButton(
+                                icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
+                                icon_color="#000000",
+                                tooltip="Update",
+                                on_click=lambda e, item=item_name: update_item(e, item)
+                            ),
+                            ft.IconButton(
+                                icon=ft.icons.DELETE_OUTLINE_ROUNDED,
+                                icon_color="#000000",
+                                tooltip="Delete",
+                                on_click=lambda e, item_id=item_id: remove_item(e, item_id)
+                            ),
+                        ],
+                        spacing=10,
+                        alignment=ft.MainAxisAlignment.CENTER,
+                    ),
+                    bgcolor="#FFFFFF",
+                    padding=ft.padding.all(4),
+                    border_radius=ft.border_radius.all(8),
+                    margin=ft.margin.symmetric(vertical=3),
+                )
+            }
         )
         # Update the UI
-        item_table.controls.clear()
-        item_table.controls.extend(items)
-        page.update()
+        update_item_table()
 
     def update_item(e, item):
         print(f"Update item: {item.value}")
 
-    def remove_item(e, id):
-        # Remove the selected item from the list and update the UI
-        items.pop(id)
+    def remove_item(e, item_id):
+        global items  # Access the global items list
+        # Find and remove the item by its ID
+        items = [item for item in items if item["id"] != item_id]
+        # Update the UI
+        update_item_table()
+
+    def update_item_table():
         item_table.controls.clear()
-        item_table.controls.extend(items)
+        for item in items:
+            item_table.controls.append(item["container"])
         page.update()
 
     # Input field
@@ -122,8 +134,8 @@ def main(page: ft.Page):
         controls=[],  # Initially empty, rows will be added dynamically
         spacing=5,
         padding=10,
-        width=420,  # Increased width for scrollbar adjustment
-        height=200,  # Set fixed height to enable scrolling
+        width=500,  # Increased width for scrollbar adjustment
+        height=300,  # Increased height to accommodate more items
         auto_scroll=True,
     )
 
@@ -152,7 +164,7 @@ def main(page: ft.Page):
             spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         ),
-        width=520,  # Increased width to provide extra space
+        width=550,  # Increased width to provide extra space
         bgcolor="#383838",
         padding=20,
         border_radius=ft.border_radius.all(20),
@@ -170,3 +182,4 @@ def main(page: ft.Page):
         )
     )
 
+ft.app(target=main)
