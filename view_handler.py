@@ -5,6 +5,7 @@ from screens.login import LoginScreen
 from screens.home import HomeScreen
 from screens.billing import BillingScreen
 from screens.settings import SettingsScreen
+from screens.Update_inv import UpdateView
 
 def views_handler(page: Page):
     return {
@@ -47,5 +48,13 @@ def views_handler(page: Page):
             bgcolor="#101010",
             scroll=False,
             controls=[SettingsScreen(page).build()],
-        )
+        ),
+        "/Update": View(
+            route="/Update",
+            horizontal_alignment=MainAxisAlignment.CENTER,
+            vertical_alignment=MainAxisAlignment.CENTER,
+            bgcolor="#101010",
+            scroll=False,
+            controls=[UpdateView(page,{}, lambda: page.go("/Inventory")).build()],
+        )    
     }

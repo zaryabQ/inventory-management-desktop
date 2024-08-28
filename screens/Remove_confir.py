@@ -1,12 +1,12 @@
 import flet as ft
 
-def main(page: ft.Page):
+def main_remove(page: ft.Page):
     # Setting the background color for the entire page
     page.bgcolor = "#383838"
 
     # Creating the text at the center
     confirmation_text = ft.Text(
-        "Are you sure you want to remove the Item",
+        "Are you sure you want to remove the entry",
         color="red",
         size=24,
         weight=ft.FontWeight.BOLD,
@@ -25,7 +25,7 @@ def main(page: ft.Page):
         icon=ft.icons.CLOSE,
         icon_color="white",
         bgcolor="teal",
-        on_click=lambda e: print("Item removal cancelled"),
+        on_click=lambda e: print("Entry removal cancelled"),
         width=70,
         height=70,
         icon_size=40
@@ -35,7 +35,7 @@ def main(page: ft.Page):
         icon=ft.icons.CHECK,
         icon_color="white",
         bgcolor="teal",
-        on_click=lambda e: print("Item removed"),
+        on_click=lambda e: print("Entry removed"),
         width=70,
         height=70,
         icon_size=40
@@ -66,4 +66,4 @@ def main(page: ft.Page):
     page.add(ft.Container(content_column, alignment=ft.alignment.center))
 
 # Running the Flet app
-ft.app(target=main)
+
