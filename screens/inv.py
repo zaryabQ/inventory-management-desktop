@@ -530,11 +530,11 @@ def main_remove(page: ft.Page, item_id, on_remove):
     )
     page.go("/remove")
 
-# App initialization
-def main(page: ft.Page):
-    page.title = "Inventory Management System"
-    inv_screen = InventoryScreen(page)
-    page.add(inv_screen.build())
-    page.update()
+# # App initialization
+# def main(page: ft.Page):
+#     page.title = "Inventory Management System"
+#     inv_screen = InventoryScreen(page)
+#     page.add(inv_screen.build())
+#     page.update()
 
-ft.app(target=main)
+# ft.app(target=main)
