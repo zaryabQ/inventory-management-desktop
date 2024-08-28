@@ -1,1 +1,0 @@
-ft.app(target=main)
