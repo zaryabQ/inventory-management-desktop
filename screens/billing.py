@@ -1,6 +1,8 @@
 import flet as ft
 from flet import *
 import sqlite3
+from screens.Bill_Gene import bill_gen
+
 
 class BillingScreen:
     def __init__(self, page: Page):
@@ -21,6 +23,7 @@ class BillingScreen:
             print(f"General error: {e}")
 
     def handle_add_bill(self, e):
+        bill_gen(self.page)
         print("Add Bill button clicked")
         # Logic to add a new bill (you can implement the SQLite logic here)
 

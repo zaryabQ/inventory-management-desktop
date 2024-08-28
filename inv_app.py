@@ -22,7 +22,7 @@ def main(page:Page) ->None:
 
 
     page.on_route_change = route_change
-    page.views.append(views_handler(page)["/"])
+    page.views.append(views_handler(page)["/Billing"])
     page.update()
     
    

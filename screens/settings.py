@@ -44,10 +44,7 @@ class SettingsScreen:
         )
 
         # Header with welcome message
-        header = Container(
-            bgcolor="#2b3037",
-            padding=0,
-            content=Row(
+        header = Row(
                 controls=[
                     Container(
                         content=Text("Welcome Back", size=40, color="#26A69A"),
@@ -58,10 +55,7 @@ class SettingsScreen:
                 vertical_alignment=CrossAxisAlignment.CENTER,
                 
                 expand=True,
-            ),
-            expand=True,
-            border=ft.border.all(2, ft.colors.WHITE)
-        )
+            )
 
         # Input fields and buttons
         input_fields = Container(
@@ -81,6 +75,7 @@ class SettingsScreen:
                             border_radius=8,
                             height=50,
                         ),
+                        alignment=alignment.center
                     ),
                     # Adding some vertical space before password fields
                     Container(height=20),  # Adjust the height to move the fields down
@@ -96,6 +91,7 @@ class SettingsScreen:
                                     password=True,
                                     height=50,
                                 ),
+                                alignment=alignment.center
                             ),
                             Container(
                                 width=300,
@@ -107,6 +103,7 @@ class SettingsScreen:
                                     password=True,
                                     height=50,
                                 ),
+                                alignment=alignment.center
                             ),
                         ],
                         spacing=10,
@@ -132,7 +129,7 @@ class SettingsScreen:
         )
 
         # Back button
-        back_button = ElevatedButton("Back", bgcolor="#2abfbf", width=100, color="#000000", on_click=lambda _: self.page.go("/Dashboard"))
+        back_button = ElevatedButton("Logout", bgcolor="#2abfbf", width=100, color="#000000", on_click=lambda _: self.page.go("/"))
 
         # Page layout
         layout = Container(
@@ -141,7 +138,7 @@ class SettingsScreen:
             content=Row(
                 controls=[
                     sidebar,
-                    VerticalDivider(width=1, color="#2abfbf"),
+             
                     Column(
                         controls=[
                             header,
@@ -150,7 +147,7 @@ class SettingsScreen:
                                     input_fields,
                                     update_buttons,
                                 ],
-                                alignment=MainAxisAlignment.START,
+                                alignment=MainAxisAlignment.CENTER,
                             ),
                             Row(
                                 controls=[
@@ -165,13 +162,12 @@ class SettingsScreen:
                             ),
                         ],
                         spacing=20,
-                        alignment=MainAxisAlignment.START,
-                        width=800,
+                        alignment=MainAxisAlignment.CENTER,
                         expand=True,
                     ),
                 ],
                 expand=True,
             )
         )
-
+ 
         return layout
