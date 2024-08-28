@@ -44,8 +44,106 @@ class InventoryScreen:
         # Logic to filter table based on search
 
     def update_item(self, e, item):
+
         print(f"Updating item {item}")
-        # Call the main_inv_upd function with the item data and a callback to return to Inventory
+        self.page.bgcolor = "#383838"
+
+    # Create a function to handle the update button click
+        def update_inventory(e):
+            # Logic for updating the inventory
+            if self.page.views:
+                self.page.views.pop(-1)
+            self.page.update()
+            print("Update button clicked")
+
+
+    # Define the update button
+        update_button = ft.ElevatedButton(
+            "Update", 
+            bgcolor="#2abfbf", 
+            color="#000000", 
+            width=100, 
+            on_click=update_inventory
+        )
+        name_field = Container(
+            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+            alignment=ft.alignment.center,
+            # padding=20
+        )
+        quantity_field = Container(
+            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+            alignment=ft.alignment.center,
+            # padding=20
+        )
+        price_field = Container(
+            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+            alignment=ft.alignment.center,
+            # padding=20
+        )
+        # Create a container for the button to center it
+        button_container = Container(
+            content=update_button,
+            alignment=ft.alignment.center,
+            # padding=20
+        )
+     
+    # Create a container for the input fields and the centered button
+        input_container = ft.Container(
+            content=ft.Column(
+                controls=[
+                    name_field,
+                    quantity_field,
+                    price_field,
+                    button_container  # Place the button container inside the column
+                ],
+                alignment=MainAxisAlignment.CENTER,
+                spacing=30
+            ),
+            padding=20,
+            border_radius=20,
+            bgcolor="#2b3037",  # Set the background color to #2b3037
+            # alignment=ft.alignment.center,
+            height=self.page.height * 0.7,   # Increase the height of the container
+            width=self.page.width * 0.5,   # Set a fixed width to ensure centering
+            margin=ft.margin.only(top=30)
+        )
+
+    # Center the input container within the page
+        self.page.views.append(
+            View(
+                "/update",
+                controls=[
+                    ft.Row(
+                        controls=[
+                            ft.Column(
+                                controls=[
+                                    ft.Container(
+                                        content=ft.Text(
+                                            "Update Product",
+                                            size=24,
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.colors.WHITE,
+                                            font_family="Arial",  # Set the font family to Arial (or any other available font)
+                                            italic=True  # Make the text italic
+                                        ),
+                                        padding=ft.padding.only(top=50),
+                                        alignment=ft.alignment.center,
+                                        width=self.page.width * 0.5 
+                                        # Adjust padding to move the heading down
+                                    ),
+                                    input_container
+                                ],
+                                alignment = MainAxisAlignment.CENTER,
+                                horizontal_alignment=alignment.center
+                            
+                            )
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,  # Aligns the Row's content to the center
+                    )
+                ]
+            )
+        )
+        #self.page.go("/update")
         #main_inv_upd(self.page, item, lambda: self.page.go("/Inventory"))
         # main_inv_upd(self.page)
         self.page.update()
@@ -201,98 +299,103 @@ class InventoryScreen:
         return layout
     
 
-# def main_inv_upd(page: ft.Page):
-#     # Set the page background color
-#     page.bgcolor = "#383838"
+def main_inv_upd(page: ft.Page):
+    # Set the page background color
+    page.bgcolor = "#383838"
 
-#     # Create a function to handle the update button click
-#     def update_inventory(e):
-#         # Logic for updating the inventory
-#         print("Update button clicked")
+    # Create a function to handle the update button click
+    def update_inventory(e):
+        # Logic for updating the inventory
+        print("Update button clicked")
 
 
-#     # Define the update button
-#     update_button = ft.ElevatedButton(
-#         "Update", 
-#         bgcolor="#2abfbf", 
-#         color="#000000", 
-#         width=100, 
-#         on_click=update_inventory
-#     )
-#     name_field = Container(
-#         content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
-#         alignment=ft.alignment.center,
-#         # padding=20
-#     )
-#     quantity_field = Container(
-#         content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
-#         alignment=ft.alignment.center,
-#         # padding=20
-#     )
-#     price_field = Container(
-#         content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
-#         alignment=ft.alignment.center,
-#         # padding=20
-#     )
-#     # Create a container for the button to center it
-#     button_container = Container(
-#         content=update_button,
-#         alignment=ft.alignment.center,
-#         # padding=20
-#     )
+    # Define the update button
+    update_button = ft.ElevatedButton(
+        "Update", 
+        bgcolor="#2abfbf", 
+        color="#000000", 
+        width=100, 
+        on_click=update_inventory
+    )
+    name_field = Container(
+        content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+        alignment=ft.alignment.center,
+        # padding=20
+    )
+    quantity_field = Container(
+        content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+        alignment=ft.alignment.center,
+        # padding=20
+    )
+    price_field = Container(
+        content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+        alignment=ft.alignment.center,
+        # padding=20
+    )
+    # Create a container for the button to center it
+    button_container = Container(
+        content=update_button,
+        alignment=ft.alignment.center,
+        # padding=20
+    )
     
-#     # Create a container for the input fields and the centered button
-#     input_container = ft.Container(
-#         content=ft.Column(
-#             controls=[
-#                 name_field,
-#                 quantity_field,
-#                 price_field,
-#                 button_container  # Place the button container inside the column
-#             ],
-#             alignment=MainAxisAlignment.CENTER,
-#             spacing=30
-#         ),
-#         padding=20,
-#         border_radius=20,
-#         bgcolor="#2b3037",  # Set the background color to #2b3037
-#         # alignment=ft.alignment.center,
-#         height=page.height * 0.7,   # Increase the height of the container
-#         width=page.width * 0.5,   # Set a fixed width to ensure centering
-#         margin=ft.margin.only(top=30)
-#     )
+    # Create a container for the input fields and the centered button
+    input_container = ft.Container(
+        content=ft.Column(
+            controls=[
+                name_field,
+                quantity_field,
+                price_field,
+                button_container  # Place the button container inside the column
+            ],
+            alignment=MainAxisAlignment.CENTER,
+            spacing=30
+        ),
+        padding=20,
+        border_radius=20,
+        bgcolor="#2b3037",  # Set the background color to #2b3037
+        # alignment=ft.alignment.center,
+        height=page.height * 0.7,   # Increase the height of the container
+        width=page.width * 0.5,   # Set a fixed width to ensure centering
+        margin=ft.margin.only(top=30)
+    )
 
-#     # Center the input container within the page
-#     page.add(
-#         ft.Row(
-#             controls=[
-#                 ft.Column(
-#                     controls=[
-#                         ft.Container(
-#                             content=ft.Text(
-#                                 "Update Product",
-#                                 size=24,
-#                                 weight=ft.FontWeight.BOLD,
-#                                 color=ft.colors.WHITE,
-#                                 font_family="Arial",  # Set the font family to Arial (or any other available font)
-#                                 italic=True  # Make the text italic
-#                             ),
-#                             padding=ft.padding.only(top=50),
-#                             alignment=ft.alignment.center,
-#                             width=page.width * 0.5 
-#                             # Adjust padding to move the heading down
-#                         ),
-#                         input_container
-#                     ],
-#                     alignment = MainAxisAlignment.CENTER,
-#                     horizontal_alignment=alignment.center
-                   
-#                 )
-#             ],
-#             alignment=ft.MainAxisAlignment.CENTER,  # Aligns the Row's content to the center
-          
-#         )
-#     )
+    # Center the input container within the page
+    page.views.append(
+        View(
+            "/update",
+            controls=[
+                ft.Row(
+                    controls=[
+                        ft.Column(
+                            controls=[
+                                ft.Container(
+                                    content=ft.Text(
+                                        "Update Product",
+                                        size=24,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.WHITE,
+                                        font_family="Arial",  # Set the font family to Arial (or any other available font)
+                                        italic=True  # Make the text italic
+                                    ),
+                                    padding=ft.padding.only(top=50),
+                                    alignment=ft.alignment.center,
+                                    width=page.width * 0.5 
+                                    # Adjust padding to move the heading down
+                                ),
+                                input_container
+                            ],
+                            alignment = MainAxisAlignment.CENTER,
+                            horizontal_alignment=alignment.center
+                        
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,  # Aligns the Row's content to the center
+                )
+            ]
+        )
+    )
+    page.go("/update")
 # Pagelet for Update Item
 
 # def main_inv_upd(page: Page, item_data, on_update):
