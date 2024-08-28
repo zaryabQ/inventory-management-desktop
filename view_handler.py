@@ -49,12 +49,12 @@ def views_handler(page: Page):
             scroll=False,
             controls=[SettingsScreen(page).build()],
         ),
-        "/Update": View(
-            route="/Update",
-            horizontal_alignment=MainAxisAlignment.CENTER,
-            vertical_alignment=MainAxisAlignment.CENTER,
-            bgcolor="#101010",
-            scroll=False,
-            controls=[UpdateView(page,{}, lambda: page.go("/Inventory")).build()],
-        )    
+        # "/Update": View(
+        #     route="/Update",
+        #     horizontal_alignment=MainAxisAlignment.CENTER,
+        #     vertical_alignment=MainAxisAlignment.CENTER,
+        #     bgcolor="#101010",
+        #     scroll=False,
+        #     controls=[UpdateView(page,{}, lambda: page.go("/Inventory")).build()],
+        # )    
     }
