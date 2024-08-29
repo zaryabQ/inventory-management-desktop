@@ -125,7 +125,7 @@ class InventoryScreen:
                                             "Update Product",
                                             size=24,
                                             weight=ft.FontWeight.BOLD,
-                                            color=ft.colors.WHITE,
+                                            color='#26A69A',
                                             font_family="Arial",  # Set the font family to Arial (or any other available font)
                                             italic=True  # Make the text italic
                                         ),

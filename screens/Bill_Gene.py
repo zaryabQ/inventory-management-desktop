@@ -84,12 +84,31 @@ def bill_gen(page):
         results = ft.Column()
         
         popup = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Search Items"),
-            content=ft.Column([search_field, results]),
-            actions=[ft.TextButton("Close", on_click=lambda e: popup.close())],
-        )
-        
+        modal=True,
+        title=ft.Text("Search Items", color="#26A69A"),  # Heading color
+        content=ft.Column([
+            ft.TextField(
+                # Assuming this is your search_field
+                label="Search",
+                bgcolor="white",  # Background color of the TextField
+                color="black",    # Text color inside the TextField
+            ),
+            results
+        ]),
+        actions=[
+            ft.TextButton(
+                "Close",
+                on_click=lambda e: [setattr(popup, 'open', False), popup.update()],
+                style=ft.ButtonStyle(
+                    bgcolor="#2abfbf",
+                    color="#000000",
+                ),
+            )
+        ],
+        bgcolor="#383838",  # Background color of the AlertDialog
+    )
+
+     
         page.dialog = popup
         popup.open = True
         page.update()
