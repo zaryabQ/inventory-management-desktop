@@ -32,7 +32,7 @@ def insert_sample_user(username, password):
         print("User already exists!")
 
 # Insert a sample user (Remove or comment this out once you have actual users)
-insert_sample_user("ammar", "123")
+# insert_sample_user("ammar", "123")
 
 class LoginScreen:
 
