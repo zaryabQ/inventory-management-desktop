@@ -2,6 +2,7 @@ import flet as ft
 from flet import *
 import sqlite3
 
+# Constants for styling
 TEXT_COLOR = colors.BLACK
 LABEL_COLOR = colors.BLACK
 BG = colors.BLUE_GREY_800
@@ -22,13 +23,36 @@ cur.execute('''
 ''')
 con.commit()
 
+# Add a sample user (for testing purposes)
+def insert_sample_user(username, password):
+    try:
+        cur.execute("INSERT INTO Users (username, password) VALUES (?, ?)", (username, password))
+        con.commit()
+    except sqlite3.IntegrityError:
+        print("User already exists!")
+
+# Insert a sample user (Remove or comment this out once you have actual users)
+insert_sample_user("ammar", "123")
+
 class LoginScreen:
 
     def __init__(self, page: Page):
         self.page = page
 
-    def handle_login(self, name, password):
-        self.page.go("/Home")
+    def handle_login(self, name_field, password_field):
+        username = name_field.value
+        password = password_field.value
+        
+        # Check if the username and password match any record in the database
+        cur.execute("SELECT * FROM Users WHERE username = ? AND password = ?", (username, password))
+        user = cur.fetchone()
+
+        if user:
+            self.page.go("/Home")  # Redirect to home page if login is successful
+        else:
+            name_field.error_text = "Invalid username or password"
+            password_field.error_text = "Invalid username or password"
+            self.page.update()  # Refresh the page to show the error
 
     def build(self):
         name = TextField(
@@ -76,25 +100,24 @@ class LoginScreen:
         )
 
         right_side_container = ft.Container(
-    content=ft.Column(
-        [
-            logo,
-            ft.Container(height=80),  # Spacer
-            name,
-            password,
-            ft.Container(height=30),  # Spacer
-            login_button
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True
-    ),
-    bgcolor=BG,
-    width=480,  # Set a fixed width for the right side
-    expand=False,  # Do not expand beyond its set width
-    border=ft.border.all(2, ft.colors.WHITE)  # Add a border with a thickness of 2 and color white
-)
-
+            content=ft.Column(
+                [
+                    logo,
+                    ft.Container(height=80),  # Spacer
+                    name,
+                    password,
+                    ft.Container(height=30),  # Spacer
+                    login_button
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True
+            ),
+            bgcolor=BG,
+            width=480,  # Set a fixed width for the right side
+            expand=False,  # Do not expand beyond its set width
+            border=ft.border.all(2, ft.colors.WHITE)  # Add a border with a thickness of 2 and color white
+        )
 
         fullsize = Row(
             controls=[
