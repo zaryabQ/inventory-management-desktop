@@ -2,6 +2,7 @@ import flet as ft
 from flet import *
 import sqlite3
 
+
 class InventoryScreen:
     def __init__(self, page: Page):
         self.page = page
