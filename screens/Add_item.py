@@ -12,13 +12,13 @@ def main(page: ft.Page):
 
     # Heading
     heading = ft.Text(
-        "Add Items to Inventory",
-        size=36,
-        weight=ft.FontWeight.W_900,
-        color="#26A69A",
-        text_align=ft.TextAlign.CENTER,
-        italic=True
-    )
+            "Add Items to Inventory",
+            size=30,
+            weight=ft.FontWeight.BOLD,
+            color='#26A69A',
+            font_family="Arial",  # Set the font family to Arial (or any other available font)
+            italic=True
+)
 
     # Creating the input fields
     item_id = ft.TextField(
@@ -75,57 +75,42 @@ def main(page: ft.Page):
         width=150
     )
 
-    # Container for input fields
-    inputs_container = ft.Column(
+    # Create the column for the input fields and button
+    content = ft.Column(
         [
-            item_id,
-            item_name,
-            quantity,
-            buy_price,
-            sale_price
+            heading,  # Heading at the top
+            ft.Container(
+                content=ft.Column(
+                    [
+                        item_id,
+                        item_name,
+                        quantity,
+                        buy_price,
+                        sale_price,
+                    ],
+                    spacing=20,
+                    alignment="center"
+                ),
+                alignment=ft.alignment.center,
+                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
+            ),
+            ft.Container(
+                content=add_button,
+                alignment=ft.alignment.center,
+                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
+            )
         ],
-        alignment="center",
+        alignment="start",  # Start alignment for top-center positioning
+        horizontal_alignment="center",
         spacing=20
     )
 
-    # Container for the button
-    button_container = ft.Container(
-        content=add_button,
-        alignment=ft.alignment.center,
-    )
-
-    # Main container for inputs and button
-    inputs_and_button_container = ft.Container(
-        content=ft.Column(
-            [
-                inputs_container,
-                button_container
-            ],
-            alignment="center",
-            spacing=20
-         ),
-        
-    )
-
-    # Container for the heading
-    heading_container = ft.Container(
-        content=heading,
-        alignment=ft.alignment.top_center,  # Align the heading at the top center
-        padding=ft.Padding(left=0, top=20, right=0, bottom=40)  # Specify padding for all sides
-    )
-
-    # Main container to center content and manage responsiveness
+    # Main container to keep everything top-centered
     main_container = ft.Container(
-        content=ft.Column(
-            [
-                heading_container,  # Heading at the top
-                inputs_and_button_container  # Input fields and button below the heading
-            ],
-            alignment="start",  # Align the column at the start (top) of the page
-            spacing=20
-        ),
-        alignment=ft.alignment.center,
-        expand=True  # Ensure it fills the available space
+        content=content,
+        alignment=ft.alignment.top_center,
+        padding=ft.Padding(left=0, right=0, top=30, bottom=0),
+        expand=True
     )
 
     # Add the main container to the page

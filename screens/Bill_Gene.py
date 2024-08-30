@@ -27,12 +27,12 @@ def bill_gen(page):
     page.bgcolor = "#263238"
 
     heading = ft.Text(
-        "Generate Bill",
-        size=36,
-        weight=ft.FontWeight.W_900,
-        color="#26A69A",
-        text_align=ft.TextAlign.CENTER,
-        italic=True,
+            "Generate Bill",
+            size=30,
+            weight=ft.FontWeight.BOLD,
+            color='#26A69A',
+            font_family="Arial",  # Set the font family to Arial (or any other available font)
+            italic=True
     )
 
     items = []

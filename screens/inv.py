@@ -123,7 +123,7 @@ class InventoryScreen:
                                     ft.Container(
                                         content=ft.Text(
                                             "Update Product",
-                                            size=24,
+                                            size=30,
                                             weight=ft.FontWeight.BOLD,
                                             color='#26A69A',
                                             font_family="Arial",  # Set the font family to Arial (or any other available font)
