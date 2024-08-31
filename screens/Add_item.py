@@ -94,6 +94,7 @@ def add_item_pop_up(page):
         content=content,
         alignment=ft.alignment.top_center,
         padding=ft.Padding(left=0, right=0, top=30, bottom=0),
+        bgcolor="#383838",
         expand=True
     )
 

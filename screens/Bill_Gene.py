@@ -22,7 +22,6 @@ def bill_gen(page):
             cross_axis_margin=10,
         )
     )
-
     page.title = "Generate Bill"
     page.bgcolor = "#263238"
 
@@ -46,8 +45,9 @@ def bill_gen(page):
             modal=True,
             title=ft.Text(f"Update {item['name']}", color="#26A69A"),
             content=ft.Column([
-                ft.TextField(label="Quantity", value=str(item['quantity'])),
-                ft.TextField(label="Selling Price", value=str(item['price'])),
+                ft.TextField(label="Quantity", value=str(item['quantity']), bgcolor="#FFFFFF"),
+                ft.TextField(label="Selling Price", value=str(item['price']), bgcolor="#FFFFFF"),
+            
             ]),
             actions=[
                 ft.TextButton(
@@ -133,6 +133,7 @@ def bill_gen(page):
                             title=ft.Text(item["name"]),
                             subtitle=ft.Text(f"Price: {item['price']}"),
                             on_click=lambda e, item=item: on_item_selected(item),
+                            bgcolor = "#FFFFFF",
                         )
                     )
             
@@ -142,6 +143,7 @@ def bill_gen(page):
             label="Search Items",
             on_change=search_item,
             width=300,
+            bgcolor = "#FFFFFF",
         )
         
         results = ft.Column()
