@@ -1,7 +1,7 @@
 import flet as ft
 from flet import *
 import sqlite3
-
+from screens.Add_item import add_item_pop_up
 
 class InventoryScreen:
     def __init__(self, page: Page):
@@ -38,6 +38,7 @@ class InventoryScreen:
 
     def add_item(self, e):
         print("Add Item clicked")
+        add_item_pop_up(self.page)
         # Logic to add item
 
     def search_item(self, e):

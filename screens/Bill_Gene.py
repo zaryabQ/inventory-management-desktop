@@ -37,10 +37,73 @@ def bill_gen(page):
 
     items = []
 
-    def update_item(e, item):
-        print(f"Update item: {item.value}")
+    def update_item(e, item_id):
+        item = next((i for i in items if i["id"] == item_id), None)
+        if not item:
+            return
+        
+        popup = ft.AlertDialog(
+            modal=True,
+            title=ft.Text(f"Update {item['name']}", color="#26A69A"),
+            content=ft.Column([
+                ft.TextField(label="Quantity", value=str(item['quantity'])),
+                ft.TextField(label="Selling Price", value=str(item['price'])),
+            ]),
+            actions=[
+                ft.TextButton(
+                    "Save",
+                    on_click=lambda e: [setattr(popup, 'open', False), update_item_details(item, popup.content)],
+                    style=ft.ButtonStyle(bgcolor="#2abfbf", color="#000000"),
+                ),
+                ft.TextButton(
+                    "Remove",
+                    on_click=lambda e: [remove_item(item_id), setattr(popup, 'open', False)],
+                    style=ft.ButtonStyle(bgcolor="#ff4d4d", color="#000000"),
+                ),
+            ],
+            bgcolor="#383838",
+        )
+        page.dialog = popup
+        popup.open = True
+        page.update()
 
-    def remove_item(e, item_id):
+
+    def update_item_details(item, content):
+        global items
+        quantity = int(content.controls[0].value)
+        price = float(content.controls[1].value)
+
+        # Update the item's data
+        item['quantity'] = quantity
+        item['price'] = price
+
+        # Update the item's container in the list
+        item["container"] = ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.Text(item["name"], width=150, color="#000000", text_align=ft.TextAlign.CENTER),
+                    ft.Text(str(item["quantity"]), width=50, color="#000000", text_align=ft.TextAlign.CENTER),
+                    ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER),
+                    ft.IconButton(
+                        icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
+                        icon_color="#000000",
+                        tooltip="Update",
+                        on_click=lambda e, item_id=item["id"]: update_item(e, item["id"])
+                    ),
+                ],
+                spacing=10,
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+            bgcolor="#FFFFFF",
+            padding=ft.padding.all(4),
+            border_radius=ft.border_radius.all(8),
+            margin=ft.margin.symmetric(vertical=3),
+        )
+
+        # Update the item table to reflect the changes
+        update_item_table()
+
+    def remove_item(item_id):
         global items
         items = [item for item in items if item["id"] != item_id]
         update_item_table()
@@ -84,30 +147,21 @@ def bill_gen(page):
         results = ft.Column()
         
         popup = ft.AlertDialog(
-        modal=True,
-        title=ft.Text("Search Items", color="#26A69A"),  # Heading color
-        content=ft.Column([
-            ft.TextField(
-                # Assuming this is your search_field
-                label="Search",
-                bgcolor="white",  # Background color of the TextField
-                color="black",    # Text color inside the TextField
-            ),
-            results
-        ]),
-        actions=[
-            ft.TextButton(
-                "Close",
-                on_click=lambda e: [setattr(popup, 'open', False), popup.update()],
-                style=ft.ButtonStyle(
-                    bgcolor="#2abfbf",
-                    color="#000000",
+            modal=True,
+            title=ft.Text("Search Items", color="#26A69A"),
+            content=ft.Column([
+                search_field,
+                results
+            ]),
+            actions=[
+                ft.TextButton(
+                    "Close",
+                    on_click=lambda e: [setattr(popup, 'open', False), popup.update()],
+                    style=ft.ButtonStyle(bgcolor="#2abfbf", color="#000000"),
                 ),
-            )
-        ],
-        bgcolor="#383838",  # Background color of the AlertDialog
-    )
-
+            ],
+            bgcolor="#383838",
+        )
      
         page.dialog = popup
         popup.open = True
@@ -115,30 +169,25 @@ def bill_gen(page):
 
     def add_item(e):
         def on_item_selected(item):
-            item_name = ft.Text(item["name"], width=150, color="#000000", text_align=ft.TextAlign.CENTER)
-            item_price = ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER)
-
             item_id = len(items)
             
             items.append(
                 {
                     "id": item_id,
+                    "name": item["name"],
+                    "quantity": 1,
+                    "price": item["price"],
                     "container": ft.Container(
                         content=ft.Row(
                             controls=[
-                                item_name,
-                                item_price,
+                                ft.Text(item["name"], width=150, color="#000000", text_align=ft.TextAlign.CENTER),
+                                ft.Text("1", width=50, color="#000000", text_align=ft.TextAlign.CENTER),
+                                ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER),
                                 ft.IconButton(
                                     icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
                                     icon_color="#000000",
                                     tooltip="Update",
-                                    on_click=lambda e, item=item_name: update_item(e, item)
-                                ),
-                                ft.IconButton(
-                                    icon=ft.icons.DELETE_OUTLINE_ROUNDED,
-                                    icon_color="#000000",
-                                    tooltip="Delete",
-                                    on_click=lambda e, item_id=item_id: remove_item(e, item_id)
+                                    on_click=lambda e, item_id=item_id: update_item(e, item_id)
                                 ),
                             ],
                             spacing=10,
@@ -148,7 +197,7 @@ def bill_gen(page):
                         padding=ft.padding.all(4),
                         border_radius=ft.border_radius.all(8),
                         margin=ft.margin.symmetric(vertical=3),
-                    )
+                    ),
                 }
             )
             update_item_table()
@@ -243,4 +292,3 @@ def bill_gen(page):
             )
         )
     page.update()
-

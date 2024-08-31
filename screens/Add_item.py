@@ -1,10 +1,12 @@
 import flet as ft
 
-def main(page: ft.Page):
+def add_item_pop_up(page):
 
     def add_item(e):
         # Code to add the item to the inventory
-        pass
+        page.views.pop()
+        page.update()
+ 
 
     # Page settings
     page.title = "Inventory Management"
@@ -96,6 +98,13 @@ def main(page: ft.Page):
     )
 
     # Add the main container to the page
-    page.add(main_container)
+    # page.add(main_container)
+    page.views.append(
+        ft.View(
+            "/add_item",
+            controls=[main_container]
+        )
+    )
+    page.update()
 
-ft.app(target=main)
+
