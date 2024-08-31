@@ -20,15 +20,6 @@ def main(page: ft.Page):
             italic=True
 )
 
-    # Creating the input fields
-    item_id = ft.TextField(
-        hint_text="Enter the Item's ID",
-        bgcolor="white",
-        color="black",
-        border_radius=10,
-        text_align="center",
-        width=300
-    )
 
     item_name = ft.TextField(
         hint_text="Enter Item Name",
@@ -49,16 +40,7 @@ def main(page: ft.Page):
     )
 
     buy_price = ft.TextField(
-        hint_text="Enter the Buy Price",
-        bgcolor="white",
-        color="black",
-        border_radius=10,
-        text_align="center",
-        width=300
-    )
-
-    sale_price = ft.TextField(
-        hint_text="Enter the Sale Price",
+        hint_text="Enter the Price",
         bgcolor="white",
         color="black",
         border_radius=10,
@@ -82,11 +64,11 @@ def main(page: ft.Page):
             ft.Container(
                 content=ft.Column(
                     [
-                        item_id,
+
                         item_name,
                         quantity,
                         buy_price,
-                        sale_price,
+
                     ],
                     spacing=20,
                     alignment="center"
