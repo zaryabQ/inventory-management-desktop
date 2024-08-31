@@ -116,6 +116,7 @@ class InventoryScreen:
         self.page.views.append(
             View(
                 "/update",
+                bgcolor="#383838",
                 controls=[
                     ft.Row(
                         controls=[
@@ -172,6 +173,7 @@ class InventoryScreen:
         self.page.views.append(
             View(
                 "/remove",
+                bgcolor="#383838",
                 controls=[
                     Column(
                         controls=[
