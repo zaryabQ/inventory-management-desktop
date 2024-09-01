@@ -78,7 +78,7 @@ class HomeScreen:
                 alignment=MainAxisAlignment.CENTER,
                 expand=True,
                 controls=[
-                    Text(value="Welcome Back", color="#00D0FF", size=40),
+                    Text(value="Welcome Back", color="#26A69A", size=40),
                     Row(
                         alignment=MainAxisAlignment.CENTER,
                         expand=True,
