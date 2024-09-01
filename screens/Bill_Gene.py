@@ -281,6 +281,7 @@ def bill_gen(page):
     page.views.append(
             ft.View(
                 "/bill",
+                bgcolor="#263238",
                 controls=[
                     ft.Column(
                         controls=[

@@ -276,7 +276,7 @@ class InventoryScreen:
                     width=300,
                     padding=10,
                 ),
-                Container(width=800),  # Space between search bar and button
+                Container(expand=True),  # Space between search bar and button
                 Container(
                     content=ElevatedButton(
                         text="Add Item",

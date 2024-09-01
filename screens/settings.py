@@ -86,16 +86,11 @@ class SettingsScreen:
         )
 
         # Header with welcome message
-        header = Row(
-            controls=[
-                Container(
-                    content=Text("Welcome Back", size=40, color="#26A69A"),
-                    padding=Padding(left=20, right=20, top=0, bottom=0),
-                ),
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            vertical_alignment=CrossAxisAlignment.CENTER,
+        header = Container(
+            content=Text("Welcome Back", size=40, color="#26A69A"),
+            alignment=alignment.center,
             expand=True,
+            padding=Padding(left=20, right=20, top=20, bottom=20),
         )
 
         # Input fields
@@ -127,7 +122,7 @@ class SettingsScreen:
 
         input_fields = Container(
             padding=Padding(20, 20, 20, 20),
-            width=1000,
+            expand=True,
             height=250,
             bgcolor="#383838",
             border_radius=10,
