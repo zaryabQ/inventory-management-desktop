@@ -76,12 +76,12 @@ class InventoryScreen:
             # padding=20
         )
         quantity_field = Container(
-            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+            content=TextField(label="Enter the New Quantity", width=300, bgcolor=ft.colors.WHITE),
             alignment=ft.alignment.center,
             # padding=20
         )
         price_field = Container(
-            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
+            content=TextField(label="Enter the New Price", width=300, bgcolor=ft.colors.WHITE),
             alignment=ft.alignment.center,
             # padding=20
         )
