@@ -1,7 +1,7 @@
 import flet as ft
 from flet import *
 from view_handler import views_handler
-
+from screens.user import User
 
 def main(page:Page) ->None:
     page.title = "Flet Inventory App"
@@ -18,11 +18,12 @@ def main(page:Page) ->None:
         #print(route)
         if page.route in route:
             page.views.append(route[page.route])
+          
         page.update()
 
 
     page.on_route_change = route_change
-    page.views.append(views_handler(page)["/Billing"])
+    page.views.append(views_handler(page)["/"])
     page.update()
     
    

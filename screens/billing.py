@@ -1,6 +1,6 @@
 import flet as ft
 from flet import *
-import sqlite3
+from db.db_handler import BillingDB  # Import the BillingDB class from the billing_db.py file
 from screens.Bill_Gene import bill_gen
 
 
@@ -8,19 +8,13 @@ class BillingScreen:
     def __init__(self, page: Page):
         self.page = page
         self.bills = []
+        #self.billing_db = BillingDB()  # Instantiate the BillingDB class
 
     def load_bills(self):
         try:
-            con = sqlite3.connect("db/sql.db")
-            cur = con.cursor()
-            cur.execute("CREATE TABLE IF NOT EXISTS Bills (id INTEGER PRIMARY KEY, name_id TEXT, billing_date TEXT, items TEXT, total_cost REAL, profit REAL, status TEXT)")
-            res = cur.execute("SELECT * FROM Bills")
-            self.bills = [i for i in res.fetchall()]
-        except sqlite3.OperationalError as e:
-            print(f"Database error: {e}")
-            print("Ensure that the 'Bills' table exists in the database.")
+            self.bills = self.billing_db.get_all_bills()
         except Exception as e:
-            print(f"General error: {e}")
+            print(f"Error loading bills: {e}")
 
     def handle_add_bill(self, e):
         bill_gen(self.page)

@@ -5,7 +5,7 @@ from screens.login import LoginScreen
 from screens.home import HomeScreen
 from screens.billing import BillingScreen
 from screens.settings import SettingsScreen
-
+from screens.user import User
 
 def views_handler(page: Page):
     return {
@@ -15,6 +15,7 @@ def views_handler(page: Page):
             vertical_alignment=MainAxisAlignment.CENTER,
             bgcolor="#101010",
             scroll=False,
+        
             controls=[LoginScreen(page).build()],
         ),
         "/Home": View(
