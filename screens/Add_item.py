@@ -6,7 +6,11 @@ def add_item_pop_up(page):
         # Code to add the item to the inventory
         page.views.pop()
         page.update()
- 
+
+    def save_item(e):
+        # Code to add the item to the inventory
+        page.views.pop()
+        page.update()
 
     # Page settings
     page.title = "Inventory Management"
@@ -53,6 +57,14 @@ def add_item_pop_up(page):
     # Creating the add button
     add_button = ft.ElevatedButton(
         "Add Item",
+        on_click=save_item,
+        bgcolor="#26A69A",  # Light teal color
+        color="white",
+        width=150
+    )
+
+    back_button = ft.ElevatedButton(
+        "Back",
         on_click=add_item,
         bgcolor="#26A69A",  # Light teal color
         color="white",
@@ -80,6 +92,11 @@ def add_item_pop_up(page):
             ),
             ft.Container(
                 content=add_button,
+                alignment=ft.alignment.center,
+                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
+            ),
+            ft.Container(
+                content=back_button,
                 alignment=ft.alignment.center,
                 padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
             )

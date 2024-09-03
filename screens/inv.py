@@ -1,25 +1,19 @@
 import flet as ft
 from flet import *
-import sqlite3
+from db.db_handler import InventoryDB  # Import the InventoryDB class from the inventory_db.py file
 from screens.Add_item import add_item_pop_up
 
 class InventoryScreen:
     def __init__(self, page: Page):
         self.page = page
         self.inventory = []
+        #self.inventory_db = InventoryDB()  # Instantiate the InventoryDB class
 
     def load_inventory(self):
         try:
-            con = sqlite3.connect("db/sql.db")
-            cur = con.cursor()
-            cur.execute("CREATE TABLE IF NOT EXISTS Inventory (id INTEGER PRIMARY KEY, product_name TEXT, quantity INTEGER, price REAL)")
-            res = cur.execute("SELECT * FROM Inventory")
-            self.inventory = [i for i in res.fetchall()]
-        except sqlite3.OperationalError as e:
-            print(f"Database error: {e}")
-            print("Ensure that the 'Inventory' table exists in the database.")
+            self.inventory = self.inventory_db.get_all_inventory()
         except Exception as e:
-            print(f"General error: {e}")
+            print(f"Error loading inventory: {e}")
 
     def create_menu_button(self, text, route):
         """Helper function to create menu buttons."""
@@ -48,110 +42,6 @@ class InventoryScreen:
     def update_item(self, e, item):
         print(f"Updating item {item}")
         self.page.bgcolor = "#383838"
-
-    # Create a function to handle the update button click
-        def update_action(e):
-            # Perform update logic here using the updated values from fields
-            # print(f"Updating product: {name_field.value}, {quantity_field.value}, {price_field.value}")
-            # Update the item in the database or the inventory list
-            # (e.g., call to the database or update the data structure)
-            # Call the on_update callback to return to the Inventory screen
-            if self.page.views:
-                self.page.views.pop()  # Remove the update view from the view stack
-
-            self.page.update()
-
-
-    # Define the update button
-        update_button = ft.ElevatedButton(
-            "Update", 
-            bgcolor="#2abfbf", 
-            color="#000000", 
-            width=100, 
-            on_click=update_action
-        )
-        name_field = Container(
-            content=TextField(label="Enter the New Name", width=300, bgcolor=ft.colors.WHITE),
-            alignment=ft.alignment.center,
-            # padding=20
-        )
-        quantity_field = Container(
-            content=TextField(label="Enter the New Quantity", width=300, bgcolor=ft.colors.WHITE),
-            alignment=ft.alignment.center,
-            # padding=20
-        )
-        price_field = Container(
-            content=TextField(label="Enter the New Price", width=300, bgcolor=ft.colors.WHITE),
-            alignment=ft.alignment.center,
-            # padding=20
-        )
-        # Create a container for the button to center it
-        button_container = Container(
-            content=update_button,
-            alignment=ft.alignment.center,
-            # padding=20
-        )
-        
-        # Create a container for the input fields and the centered button
-        input_container = ft.Container(
-            content=ft.Column(
-                controls=[
-                    name_field,
-                    quantity_field,
-                    price_field,
-                    button_container  # Place the button container inside the column
-                ],
-                alignment=MainAxisAlignment.CENTER,
-                spacing=30
-            ),
-            padding=20,
-            border_radius=20,
-            bgcolor="#2b3037",  # Set the background color to #2b3037
-            # alignment=ft.alignment.center,
-            height=self.page.height * 0.7,   # Increase the height of the container
-            width=self.page.width * 0.5,   # Set a fixed width to ensure centering
-            margin=ft.margin.only(top=30)
-        )
-        
-
-        self.page.views.append(
-            View(
-                "/update",
-                bgcolor="#383838",
-                controls=[
-                    ft.Row(
-                        controls=[
-                            ft.Column(
-                                controls=[
-                                    ft.Container(
-                                        content=ft.Text(
-                                            "Update Product",
-                                            size=30,
-                                            weight=ft.FontWeight.BOLD,
-                                            color='#26A69A',
-                                            font_family="Arial",  # Set the font family to Arial (or any other available font)
-                                            italic=True  # Make the text italic
-                                        ),
-                                        padding=ft.padding.only(top=50),
-                                        alignment=ft.alignment.center,
-                                        width=self.page.width * 0.5 
-                                        # Adjust padding to move the heading down
-                                    ),
-                                    input_container
-                                ],
-                                alignment = MainAxisAlignment.CENTER,
-                                horizontal_alignment=alignment.center
-                            
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,  # Aligns the Row's content to the center
-                    )
-                ]
-            )
-        )
-        #main_inv_upd(self.page, item, lambda: self.page.go("/Inventory"))
-        # main_inv_upd(self.page)
-        self.page.update()
 
     def remove_item(self, e, item_id):
         print(f"Removing item {item_id}")
@@ -220,7 +110,6 @@ class InventoryScreen:
                 ]
             )
         )
-        #main_remove(self.page, item_id, lambda: self.page.go("/Inventory"))
         self.page.update()
 
     def build(self):
@@ -274,66 +163,39 @@ class InventoryScreen:
                         border_radius=10,
                     ),
                     width=300,
-                    padding=10,
+                    height=50,
                 ),
-                Container(expand=True),  # Space between search bar and button
-                Container(
-                    content=ElevatedButton(
-                        text="Add Item",
-                        on_click=self.add_item,
-                        bgcolor="#2abfbf",
-                        color="#000000",
-                    ),
-                    border_radius=20,
-                    padding=0,
-                ),
+                ElevatedButton("Add Item", on_click=self.add_item, bgcolor="#2abfbf", color="#000000"),
             ],
-            alignment=MainAxisAlignment.START,
+            alignment=MainAxisAlignment.SPACE_BETWEEN,
         )
 
         # Inventory data table
         table = DataTable(
             columns=[
-                DataColumn(Text("Product Name", color="#000000")),
-                DataColumn(Text("Quantity", color="#000000")),
-                DataColumn(Text("Price", color="#000000")),
-                DataColumn(IconButton(
-                                icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
-                                icon_color="#000000",
-                                tooltip="Update",
-                                on_click=lambda e, item=5: self.update_item(e, item)
-                            )
-                ),
-                DataColumn(IconButton(
-                                icon=ft.icons.DELETE_OUTLINE_ROUNDED,
-                                icon_color="#000000",
-                                tooltip="Delete",
-                                on_click=lambda e, id=0: self.remove_item(e, id)
-                            )
-                ),
+                DataColumn(Text("Name/ID")),
+                DataColumn(Text("Category")),
+                DataColumn(Text("Quantity")),
+                DataColumn(Text("Unit Cost")),
+                DataColumn(Text("Selling Price")),
+                DataColumn(Text("Profit")),
+                DataColumn(Text("Actions")),
             ],
             rows=[
                 DataRow(
                     cells=[
-                        DataCell(Text(i[1]), padding=Padding(left=20, right=20)),
-                        DataCell(Text(i[2]), padding=Padding(left=20, right=20)),
-                        DataCell(Text(i[3]), padding=Padding(left=20, right=20)),
+                        DataCell(Text(item[1]), padding=Padding(left=20, right=20)),  # Name/ID
+                        DataCell(Text(item[2]), padding=Padding(left=20, right=20)),  # Category
+                        DataCell(Text(f"{item[3]}"), padding=Padding(left=20, right=20)),  # Quantity
+                        DataCell(Text(f"${item[4]:.2f}"), padding=Padding(left=20, right=20)),  # Unit Cost
+                        DataCell(Text(f"${item[5]:.2f}"), padding=Padding(left=20, right=20)),  # Selling Price
+                        DataCell(Text(f"${item[6]:.2f}"), padding=Padding(left=20, right=20)),  # Profit
                         DataCell(
                             Row(
                                 controls=[
-                                    IconButton(
-                                        icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
-                                        icon_color="#000000",
-                                        tooltip="Update",
-                                        on_click=lambda e, item=i: self.update_item(e, item)
-                                    ),
+                                    IconButton(icons.UPDATE, on_click=lambda e, item=item[0]: self.update_item(e, item)),
                                     Container(width=10),
-                                    IconButton(
-                                        icon=ft.icons.DELETE_OUTLINE_ROUNDED,
-                                        icon_color="#000000",
-                                        tooltip="Remove",
-                                        on_click=lambda e, id=i[0]: self.remove_item(e, id)
-                                    ),
+                                    IconButton(icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
                                 ],
                                 alignment=MainAxisAlignment.CENTER,
                             ),
@@ -341,7 +203,7 @@ class InventoryScreen:
                         ),
                     ]
                 )
-                for i in self.inventory
+                for item in self.inventory
             ],
         )
 

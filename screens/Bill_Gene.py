@@ -212,6 +212,10 @@ def bill_gen(page):
         page.views.pop()
         page.update()
 
+    def go_back(e):
+        page.views.pop()
+        page.update()
+
     input_field = ft.Container(
         width=300,
         height=45,
@@ -262,6 +266,19 @@ def bill_gen(page):
         alignment=ft.alignment.center,
     )
 
+    back_button = ft.Container(
+        content=ft.ElevatedButton(
+            text="Back",
+            width=150,
+            height=40,
+            color="#000000",
+            bgcolor="#2abfbf",
+            on_click=go_back
+        ),
+        border_radius=ft.border_radius.all(20),
+        alignment=ft.alignment.center,
+    )
+
     main_container = ft.Container(
         content=ft.Column(
             controls=[
@@ -269,6 +286,7 @@ def bill_gen(page):
                 add_items_button,
                 item_table,
                 save_button,
+                back_button,
             ],
             spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
