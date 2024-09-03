@@ -1,17 +1,21 @@
 import flet as ft
 from flet import *
-from db.db_handler import InventoryDB  # Import the InventoryDB class from the inventory_db.py file
+from db.inv_handler import InventoryHandler  # Import the InventoryHandler class from handler.py
 from screens.Add_item import add_item_pop_up
+from screens.utils import main_inv_upd  # Assuming you have a separate module for update logic
+from screens.utils import main_remove  # Assuming you have a separate module for remove logic
 
 class InventoryScreen:
     def __init__(self, page: Page):
         self.page = page
         self.inventory = []
-        #self.inventory_db = InventoryDB()  # Instantiate the InventoryDB class
+        self.inventory_db = InventoryHandler()  # Instantiate the InventoryHandler class
 
     def load_inventory(self):
+        """Load inventory data using the handler."""
         try:
-            self.inventory = self.inventory_db.get_all_inventory()
+            self.inventory = self.inventory_db.load_inventory()
+            self.refresh_table()
         except Exception as e:
             print(f"Error loading inventory: {e}")
 
@@ -31,35 +35,33 @@ class InventoryScreen:
         )
 
     def add_item(self, e):
-        print("Add Item clicked")
-        add_item_pop_up(self.page)
-        # Logic to add item
+        """Trigger the add item pop-up."""
+        add_item_pop_up(self.page,self.inventory_db)
 
     def search_item(self, e):
-        print(f"Searching for {e.control.value}")
-        # Logic to filter table based on search
+        """Search for items in the inventory."""
+        keyword = e.control.value
+        self.inventory = self.inventory_db.search_items(keyword)
+        self.refresh_table()
 
-    def update_item(self, e, item):
-        print(f"Updating item {item}")
-        self.page.bgcolor = "#383838"
+    def update_item(self, e, item_id):
+        """Update an item in the inventory."""
+        item_data = next((item for item in self.inventory if item[0] == item_id), None)
+        if item_data:
+            main_inv_upd(self.page, item_data, self.load_inventory)
 
     def remove_item(self, e, item_id):
-        print(f"Removing item {item_id}")
-
+        """Remove an item from the inventory."""
         def cancel_remove(e):
-            print("Entry removal cancelled")
             if self.page.views:
-                self.page.views.pop()  # Remove the update view from the view stack
-
+                self.page.views.pop()  # Remove the confirmation view
             self.page.update()  # Return to the Inventory screen without removing
 
         def confirm_remove(e):
-            print(f"Entry {item_id} removed")
-            # Logic to remove the item from the database or inventory list
-            if self.page.views:
-                self.page.views.pop()  # Remove the update view from the view stack
-
-            self.page.update()  # Return to the Inventory screen after removing
+            self.inventory_db.remove_item(item_id)
+            self.load_inventory() 
+            self.page.views.pop()
+            self.page.update() # Refresh the inventory after removal
 
         self.page.views.append(
             View(
@@ -111,6 +113,53 @@ class InventoryScreen:
             )
         )
         self.page.update()
+
+    def refresh_table(self):
+        """Refresh the table to reflect the current inventory."""
+        table = self.build_table()
+        # Update table content in the page layout
+        self.page.controls[-1].controls[-1].controls[-1].content = table
+        self.page.update()
+
+    def build_table(self):
+        """Build the inventory table."""
+        return DataTable(
+            columns=[
+                DataColumn(Text("ID")),
+                DataColumn(Text("Name")),
+                DataColumn(Text("Quantity")),
+                DataColumn(Text("Cost")),
+                DataColumn(Text("Date")),
+                DataColumn(Text("Edit")),
+                
+            ],
+            rows=[
+                DataRow(
+                    cells=[
+                        DataCell(Text(str(item[0]))),  # ID
+                        DataCell(Text(item[1])),      # Name
+                        DataCell(Text(str(item[2]))), # Quantity
+                        DataCell(Text(str(item[3]))), # Price
+                        DataCell(Text(item[4])),
+                        DataCell(
+                            Container(
+                                Row(
+                                    controls=[
+                                        IconButton(icons.UPDATE, on_click=lambda e, item_id=item[0]: self.update_item(e, item_id)),
+                                        Container(width=10),
+                                        IconButton(icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
+                                    ],
+                                    alignment=MainAxisAlignment.CENTER,
+                                ),
+                                padding=Padding(left=10, right=10, top=0, bottom=0)
+                            )
+                        ),
+                    ]
+                )
+                for item in self.inventory
+            ],
+        )
+
 
     def build(self):
         self.load_inventory()
@@ -171,41 +220,7 @@ class InventoryScreen:
         )
 
         # Inventory data table
-        table = DataTable(
-            columns=[
-                DataColumn(Text("Name/ID")),
-                DataColumn(Text("Category")),
-                DataColumn(Text("Quantity")),
-                DataColumn(Text("Unit Cost")),
-                DataColumn(Text("Selling Price")),
-                DataColumn(Text("Profit")),
-                DataColumn(Text("Actions")),
-            ],
-            rows=[
-                DataRow(
-                    cells=[
-                        DataCell(Text(item[1]), padding=Padding(left=20, right=20)),  # Name/ID
-                        DataCell(Text(item[2]), padding=Padding(left=20, right=20)),  # Category
-                        DataCell(Text(f"{item[3]}"), padding=Padding(left=20, right=20)),  # Quantity
-                        DataCell(Text(f"${item[4]:.2f}"), padding=Padding(left=20, right=20)),  # Unit Cost
-                        DataCell(Text(f"${item[5]:.2f}"), padding=Padding(left=20, right=20)),  # Selling Price
-                        DataCell(Text(f"${item[6]:.2f}"), padding=Padding(left=20, right=20)),  # Profit
-                        DataCell(
-                            Row(
-                                controls=[
-                                    IconButton(icons.UPDATE, on_click=lambda e, item=item[0]: self.update_item(e, item)),
-                                    Container(width=10),
-                                    IconButton(icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
-                                ],
-                                alignment=MainAxisAlignment.CENTER,
-                            ),
-                            padding=Padding(left=20, right=20),
-                        ),
-                    ]
-                )
-                for item in self.inventory
-            ],
-        )
+        table = self.build_table()
 
         # Main layout combining menu bar and content area
         layout = Row(

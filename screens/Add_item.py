@@ -1,16 +1,68 @@
 import flet as ft
+from flet import *
+from db.inv_handler import InventoryHandler
 
-def add_item_pop_up(page):
+def add_item_pop_up(page, inventory_db):
+
+    def show_snackbar(message):
+        """Helper function to show a snackbar with a message."""
+        snackbar = ft.SnackBar(
+            content=ft.Text(message),
+            bgcolor=ft.colors.RED_800,
+            duration=2000  # Duration in milliseconds
+        )
+        page.snack_bar = snackbar
+        page.snack_bar.open = True
+        page.update()
 
     def add_item(e):
-        # Code to add the item to the inventory
+        # Close the pop-up without saving
         page.views.pop()
+        page.go('/Inventory')
         page.update()
 
     def save_item(e):
-        # Code to add the item to the inventory
-        page.views.pop()
-        page.update()
+        name = item_name.value.strip()
+        quantity = item_quantity.value.strip()
+        cost = buy_price.value.strip()
+
+        # Validate fields
+        if not name:
+            show_snackbar("Item Name cannot be empty.")
+            return
+        if not quantity:
+            show_snackbar("Quantity cannot be empty.")
+            return
+        if not cost:
+            show_snackbar("Cost cannot be empty.")
+            return
+
+        # Validate data types
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            show_snackbar("Quantity must be a numeric value.")
+            return
+
+        try:
+            cost = float(cost)
+        except ValueError:
+            show_snackbar("Cost must be a numeric value.")
+            return
+
+        try:
+            # Add item to the inventory
+            inventory_db.add_item(name, quantity, cost)
+            # Clear the fields
+            item_name.value = ""
+            item_quantity.value = ""
+            buy_price.value = ""
+            # Close the pop-up
+            page.views.pop()
+            page.go('/Inventory')
+            page.update()
+        except ValueError as ve:
+            show_snackbar(str(ve))
 
     # Page settings
     page.title = "Inventory Management"
@@ -18,14 +70,13 @@ def add_item_pop_up(page):
 
     # Heading
     heading = ft.Text(
-            "Add Items to Inventory",
-            size=30,
-            weight=ft.FontWeight.BOLD,
-            color='#26A69A',
-            font_family="Arial",  # Set the font family to Arial (or any other available font)
-            italic=True
-)
-
+        "Add Items to Inventory",
+        size=30,
+        weight=ft.FontWeight.BOLD,
+        color='#26A69A',
+        font_family="Arial",  # Set the font family to Arial (or any other available font)
+        italic=True
+    )
 
     item_name = ft.TextField(
         hint_text="Enter Item Name",
@@ -36,7 +87,7 @@ def add_item_pop_up(page):
         width=300
     )
 
-    quantity = ft.TextField(
+    item_quantity = ft.TextField(
         hint_text="Enter the Quantity",
         bgcolor="white",
         color="black",
@@ -78,11 +129,9 @@ def add_item_pop_up(page):
             ft.Container(
                 content=ft.Column(
                     [
-
                         item_name,
-                        quantity,
+                        item_quantity,
                         buy_price,
-
                     ],
                     spacing=20,
                     alignment="center"
@@ -116,7 +165,6 @@ def add_item_pop_up(page):
     )
 
     # Add the main container to the page
-    # page.add(main_container)
     page.views.append(
         ft.View(
             "/add_item",
@@ -124,5 +172,3 @@ def add_item_pop_up(page):
         )
     )
     page.update()
-
-
