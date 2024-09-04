@@ -1,81 +1,110 @@
 from flet import *
+import flet as ft
 from db.inv_handler import InventoryHandler
 
 def main_inv_upd(page, item_data, on_update):
-    name_field = TextField(label="Product Name", value=item_data[1], bgcolor=colors.WHITE, width=page.width * 0.4)
-    quantity_field = TextField(label="Quantity", value=str(item_data[3]), bgcolor=colors.WHITE, width=page.width * 0.4)
-    price_field = TextField(label="Price", value=str(item_data[4]), bgcolor=colors.WHITE, width=page.width * 0.4)
+    name_field = ft.TextField(label="Product Name", value=item_data[1], bgcolor=ft.colors.WHITE, width=page.width * 0.4)
+    quantity_field = ft.TextField(label="Quantity", value=str(item_data[2]), bgcolor=ft.colors.WHITE, width=page.width * 0.4)
+    price_field = ft.TextField(label="Price", value=str(item_data[3]), bgcolor=ft.colors.WHITE, width=page.width * 0.4)
 
     def update_action(e):
-        # Update the item in the database
-        InventoryHandler.update_item_in_db(
-            item_id=item_data[0],
-            name=name_field.value,
-            quantity=quantity_field.value,
-            price=price_field.value
-        )
-        # Refresh the Inventory page
-        page.go("/Inventory")  # Navigate back to the Inventory page
+        empty_fields = []
+        if not name_field.value.strip():
+            empty_fields.append("Name")
+        if not quantity_field.value.strip():
+            empty_fields.append("Quantity")
+        if not price_field.value.strip():
+            empty_fields.append("Price")
+
+        if empty_fields:
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text(f"Fields missing: {', '.join(empty_fields)}. Please fill at least one field."),
+                action="DISMISS"
+            )
+            page.snack_bar.open = True
+            page.update()
+
+            # On second click, proceed with update if at least one field is filled
+            if len(empty_fields) < 3:
+                update_db_fields = {
+                    'name': name_field.value if name_field.value.strip() else item_data[1],
+                    'quantity': quantity_field.value if quantity_field.value.strip() else item_data[2],
+                    'price': price_field.value if price_field.value.strip() else item_data[3]
+                }
+                on_update(update_db_fields)
+                page.views.pop()
+                page.update()
+        else:
+            # Update the item in the database
+            update_db_fields = {
+                'name': name_field.value,
+                'quantity': quantity_field.value,
+                'price': price_field.value
+            }
+            on_update(update_db_fields)
+            page.views.pop()
+            page.update()
 
     def back_action(e):
-        page.go("/Inventory")  # Navigate back to the Inventory page
+        page.views.pop()
+        page.update()
 
-    # Create and add the Update Item View
     page.views.append(
-        View(
+        ft.View(
             "/update",
             bgcolor="#2b3037",
             controls=[
-                Row(
+                ft.Row(
                     controls=[
-                        Container(
-                            content=Column(
+                        ft.Container(
+                            content=ft.Column(
                                 controls=[
-                                    Text(
+                                    ft.Text(
                                         "Update Product",
                                         size=24,
-                                        weight=FontWeight.BOLD,
-                                        color=colors.WHITE,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.WHITE,
                                         font_family="Arial",
                                         italic=True
                                     ),
                                     name_field,
                                     quantity_field,
                                     price_field,
-                                    ElevatedButton(
+                                    ft.ElevatedButton(
                                         "Update",
                                         on_click=update_action,
                                         bgcolor="#2abfbf",
                                         color="#000000"
                                     ),
-                                    ElevatedButton(
+                                    ft.ElevatedButton(
                                         "Back",
                                         on_click=back_action,
                                         bgcolor="#2abfbf",
                                         color="#000000"
                                     )
                                 ],
-                                alignment=MainAxisAlignment.CENTER,
-                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 spacing=30,
-                                expand=True  # Expand the Column to fill available space
+                                expand=True
                             ),
                             padding=20,
                             border_radius=20,
                             bgcolor="#383838",
                             width=page.width * 0.5,
-                            alignment=alignment.center,
+                            alignment=ft.alignment.center,
                         ),
                     ],
-                    alignment=MainAxisAlignment.CENTER,
-                    expand=True,  # Expand the Row to fill available space
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    expand=True
                 )
             ],
-            horizontal_alignment=CrossAxisAlignment.CENTER,
-            vertical_alignment=MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            vertical_alignment=ft.MainAxisAlignment.CENTER,
         )
     )
     page.update()
+
 
 
 

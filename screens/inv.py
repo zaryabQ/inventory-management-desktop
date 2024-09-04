@@ -62,6 +62,7 @@ class InventoryScreen:
                     print(f"Error updating item: {ex}")
             main_inv_upd(self.page, item_data, save_update)
 
+
     def remove_item(self, e, item_id):
         """Remove an item from the inventory."""
         def cancel_remove(e):

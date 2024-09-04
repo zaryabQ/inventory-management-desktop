@@ -43,18 +43,38 @@ class InventoryHandler:
             conn.close()
 
     @staticmethod
-    def update_item(item_id, name, quantity, cost):
+    def update_item(item_id, update_data):
         """Update an existing item in the inventory."""
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("UPDATE inventory SET name = ?, quantity = ?, cost = ? WHERE id = ?",
-                           (name, quantity, cost, item_id))
-            conn.commit()
+            # Prepare the SQL query based on provided fields
+            fields_to_update = []
+            values = []
+            
+            if 'name' in update_data and update_data['name']:
+                fields_to_update.append("name = ?")
+                values.append(update_data['name'])
+            if 'quantity' in update_data and update_data['quantity']:
+                fields_to_update.append("quantity = ?")
+                values.append(update_data['quantity'])
+            if 'price' in update_data and update_data['price']:
+                fields_to_update.append("cost = ?")
+                values.append(update_data['price'])
+            
+            values.append(item_id)  # Add item_id to the end for the WHERE clause
+
+            if fields_to_update:
+                query = f"UPDATE inventory SET {', '.join(fields_to_update)} WHERE id = ?"
+                cursor.execute(query, values)
+                conn.commit()
+            else:
+                print("No fields to update.")
         except sqlite3.Error as e:
             print(f"Error updating item: {e}")
         finally:
             conn.close()
+
 
     @staticmethod
     def remove_item(item_id):
@@ -100,31 +120,5 @@ class InventoryHandler:
         finally:    
             conn.close()        
 
-    @staticmethod
-    def update_item_in_db(item_id, name, quantity, price):
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE inventory SET name = ?, quantity = ?, price = ? WHERE id = ?",
-                (name, quantity, price, item_id)
-            )
-            conn.commit()
-            print("Item updated successfully.")
-        except Exception as e:
-            print(f"Error updating item: {e}")
-        finally:
-            conn.close()
-
-    @staticmethod
-    def remove_item_from_db(item_id):
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM inventory WHERE id = ?", (item_id,))
-            conn.commit()
-            print("Item removed successfully.")
-        except Exception as e:
-            print(f"Error removing item: {e}")
-        finally:
-            conn.close()
+    
+    
