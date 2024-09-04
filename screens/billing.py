@@ -1,29 +1,39 @@
 import flet as ft
 from flet import *
-from db.db_handler import BillingDB  # Import the BillingDB class from the billing_db.py file
+from db.billing_handler import BillingHandler  # Import the BillingDB class
 from screens.Bill_Gene import bill_gen
-
+from screens.utils import main_remove  # Assuming you have a remove logic in utils
 
 class BillingScreen:
     def __init__(self, page: Page):
         self.page = page
         self.bills = []
-        #self.billing_db = BillingDB()  # Instantiate the BillingDB class
+        self.billing_db = BillingHandler()  # Instantiate the BillingDB class
+        self.table_container = None  # Initialize a reference for the table container
 
     def load_bills(self):
+        """Load all bills from the database."""
         try:
-            self.bills = self.billing_db.get_all_bills()
+            self.bills = self.billing_db.load_billing()
+            if self.bills is None:
+                self.bills = []  # Safeguard against None
+            self.refresh_table()
         except Exception as e:
             print(f"Error loading bills: {e}")
 
-    def handle_add_bill(self, e):
-        bill_gen(self.page)
-        print("Add Bill button clicked")
-        # Logic to add a new bill (you can implement the SQLite logic here)
+    def search_bills(self, e):
+        """Search for bills in the database."""
+        keyword = e.control.value.strip()
+        if keyword:
+            self.bills = self.billing_db.search_bills(keyword)
+        else:
+            self.bills = self.billing_db.load_billing()  # Load all bills if search is empty
+        self.refresh_table()
 
-    def handle_delete_or_update(self, id):
-        print(f"Deleting or updating bill with ID {id}")
-        # Logic to delete or update a bill (you can implement the SQLite logic here)
+    def handle_add_bill(self, e):
+        """Handle the 'Add Bill' button click."""
+        bill_gen(self.page)
+
 
     def create_menu_button(self, text, route):
         """Helper function to create menu buttons."""
@@ -38,6 +48,123 @@ class BillingScreen:
                 color="white",
                 expand=True,
             ),
+        )
+
+    def update_bill(self, e, bill_id):
+        """Placeholder for bill update functionality."""
+        print(f"Update Bill with ID {bill_id}")
+        # You can later add logic to open the update screen
+
+    def remove_bill(self, e, bill_id):
+        """Remove a bill."""
+        def cancel_remove(e):
+            if self.page.views:
+                self.page.views.pop()  # Remove the confirmation view
+            self.page.update()  # Return to the Billing screen without removing
+
+        def confirm_remove(e):
+            self.billing_db.remove_bill(bill_id)
+            self.load_bills()
+            self.page.views.pop()
+            self.page.update()  # Refresh the billing table after removal
+
+        self.page.views.append(
+            View(
+                "/remove",
+                bgcolor="#383838",
+                controls=[
+                    Column(
+                        controls=[
+                            Container(
+                                content=Text(
+                                    "Are you sure you want to remove the entry?",
+                                    color="red",
+                                    size=24,
+                                    weight=ft.FontWeight.BOLD,
+                                    text_align=ft.TextAlign.CENTER
+                                ),
+                                alignment=ft.alignment.center,
+                                padding=ft.padding.only(top=150)
+                            ),
+                            Row(
+                                controls=[
+                                    IconButton(
+                                        icon=ft.icons.CLOSE,
+                                        icon_color="white",
+                                        bgcolor="teal",
+                                        on_click=cancel_remove,
+                                        width=70,
+                                        height=70,
+                                        icon_size=40
+                                    ),
+                                    IconButton(
+                                        icon=ft.icons.CHECK,
+                                        icon_color="white",
+                                        bgcolor="teal",
+                                        on_click=confirm_remove,
+                                        width=70,
+                                        height=70,
+                                        icon_size=40
+                                    ),
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                spacing=50,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        spacing=100,
+                    )
+                ]
+            )
+        )
+        self.page.update()
+
+    def refresh_table(self):
+        """Refresh the table to reflect the current bills."""
+        if self.table_container:
+            self.table_container.content = self.build_table()
+            self.page.update()
+        else:
+            print("Error: Table container reference not found.")
+
+    def build_table(self):
+        """Build the billing table."""
+        return DataTable(
+            columns=[
+                DataColumn(Text("Name/ID")),
+                DataColumn(Text("Billing Date")),
+                DataColumn(Text("Items")),
+                DataColumn(Text("Total Cost")),
+                DataColumn(Text("Profit")),
+                DataColumn(Text("Status")),
+                DataColumn(Text("Actions")),
+            ],
+            rows=[
+                DataRow(
+                    cells=[
+                        DataCell(Text(bill[1])),  # Name/ID
+                        DataCell(Text(bill[2])),  # Billing Date
+                        DataCell(Text(bill[3])),  # Items
+                        DataCell(Text(f"${bill[4]:.2f}")),  # Total Cost
+                        DataCell(Text(f"${bill[5]:.2f}")),  # Profit
+                        DataCell(Text(bill[6])),  # Status
+                        DataCell(
+                            Container(
+                                Row(
+                                    controls=[
+                                        IconButton(icons.UPDATE, on_click=lambda e, id=bill[0]: self.update_bill(e, id)),
+                                        Container(width=10),
+                                        IconButton(icons.DELETE, on_click=lambda e, id=bill[0]: self.remove_bill(e, id)),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ),
+                                padding=Padding(left=10, right=10, top=0, bottom=0)
+                            )
+                        ),
+                    ]
+                )
+                for bill in self.bills
+            ],
         )
 
     def build(self):
@@ -79,54 +206,28 @@ class BillingScreen:
             ),
         )
 
-        # Container above the DataTable with "Invoice" and "Add Bill" button
-        invoice_header = Container(
-            padding=10,
-            content=Row(
-                controls=[
-                    Text("Invoice", size=30, weight="bold", color=colors.BLACK),
-                    ElevatedButton("Add Bill", on_click=self.handle_add_bill, bgcolor="#2abfbf", color="#000000"),
-                ],
-                alignment=MainAxisAlignment.SPACE_BETWEEN,
-            ),
+        # Search bar with Add Bill button
+        search_bar_row = Row(
+            controls=[
+                Container(
+                    content=TextField(
+                        hint_text="Search Bill",
+                        on_change=self.search_bills,
+                        height=50,
+                        bgcolor="#ffffff",
+                        border_radius=10,
+                    ),
+                    width=300,
+                    height=50,
+                ),
+                ElevatedButton("Add Bill", on_click=self.handle_add_bill, bgcolor="#2abfbf", color="#000000"),
+            ],
+            alignment=MainAxisAlignment.SPACE_BETWEEN,
         )
 
         # Billing data table
-        table = DataTable(
-            columns=[
-                DataColumn(Text("Name/ID")),
-                DataColumn(Text("Billing Date")),
-                DataColumn(Text("Items")),
-                DataColumn(Text("Total Cost")),
-                DataColumn(Text("Profit")),
-                DataColumn(Text("Status")),
-                DataColumn(Text("Actions")),
-            ],
-            rows=[
-                DataRow(
-                    cells=[
-                        DataCell(Text(bill[1]), padding=Padding(left=20, right=20)),  # Name/ID
-                        DataCell(Text(bill[2]), padding=Padding(left=20, right=20)),  # Billing Date
-                        DataCell(Text(bill[3]), padding=Padding(left=20, right=20)),  # Items
-                        DataCell(Text(f"${bill[4]:.2f}"), padding=Padding(left=20, right=20)),  # Total Cost
-                        DataCell(Text(f"${bill[5]:.2f}"), padding=Padding(left=20, right=20)),  # Profit
-                        DataCell(Text(bill[6]), padding=Padding(left=20, right=20)),  # Status
-                        DataCell(
-                            Row(
-                                controls=[
-                                    IconButton(icons.UPDATE, on_click=lambda e, id=bill[0]: self.handle_delete_or_update(id)),
-                                    Container(width=10),
-                                    IconButton(icons.DELETE, on_click=lambda e, id=bill[0]: self.handle_delete_or_update(id)),
-                                ],
-                                alignment=MainAxisAlignment.CENTER,
-                            ),
-                            padding=Padding(left=20, right=20),
-                        ),
-                    ]
-                )
-                for bill in self.bills
-            ],
-        )
+        table = self.build_table()
+        self.table_container = Container(table, padding=10, expand=True)  # Store reference here
 
         # Main layout combining menu bar and content area
         layout = Row(
@@ -138,8 +239,8 @@ class BillingScreen:
                     content=Column(
                         controls=[
                             Container(header, padding=10),
-                            invoice_header,
-                            Container(table, padding=10, expand=True),
+                            search_bar_row,
+                            self.table_container,  # Use the stored reference
                         ],
                         expand=True,
                     ),
