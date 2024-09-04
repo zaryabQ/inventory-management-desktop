@@ -10,11 +10,14 @@ class InventoryScreen:
         self.page = page
         self.inventory = []
         self.inventory_db = InventoryHandler()  # Instantiate the InventoryHandler class
+        self.table_container = None  # Initialize a reference for the table container
 
     def load_inventory(self):
         """Load inventory data using the handler."""
         try:
             self.inventory = self.inventory_db.load_inventory()
+            if self.inventory is None:
+                self.inventory = []  # Safeguard against None
             self.refresh_table()
         except Exception as e:
             print(f"Error loading inventory: {e}")
@@ -36,19 +39,28 @@ class InventoryScreen:
 
     def add_item(self, e):
         """Trigger the add item pop-up."""
-        add_item_pop_up(self.page,self.inventory_db)
+        add_item_pop_up(self.page, self.inventory_db)
 
     def search_item(self, e):
         """Search for items in the inventory."""
-        keyword = e.control.value
-        self.inventory = self.inventory_db.search_items(keyword)
+        keyword = e.control.value.strip()
+        if keyword:
+            self.inventory = self.inventory_db.search_items(keyword)
+        else:
+            self.inventory = self.inventory_db.load_inventory()  # Load all items if search is empty
         self.refresh_table()
 
     def update_item(self, e, item_id):
         """Update an item in the inventory."""
         item_data = next((item for item in self.inventory if item[0] == item_id), None)
         if item_data:
-            main_inv_upd(self.page, item_data, self.load_inventory)
+            def save_update(updated_data):
+                try:
+                    self.inventory_db.update_item(item_id, updated_data)
+                    self.load_inventory()
+                except Exception as ex:
+                    print(f"Error updating item: {ex}")
+            main_inv_upd(self.page, item_data, save_update)
 
     def remove_item(self, e, item_id):
         """Remove an item from the inventory."""
@@ -72,7 +84,7 @@ class InventoryScreen:
                         controls=[
                             Container(
                                 content=Text(
-                                    "Are you sure you want to remove the entry",
+                                    "Are you sure you want to remove the entry?",
                                     color="red",
                                     size=24,
                                     weight=ft.FontWeight.BOLD,
@@ -116,10 +128,11 @@ class InventoryScreen:
 
     def refresh_table(self):
         """Refresh the table to reflect the current inventory."""
-        table = self.build_table()
-        # Update table content in the page layout
-        self.page.controls[-1].controls[-1].controls[-1].content = table
-        self.page.update()
+        if self.table_container:
+            self.table_container.content = self.build_table()
+            self.page.update()
+        else:
+            print("Error: Table container reference not found.")
 
     def build_table(self):
         """Build the inventory table."""
@@ -131,7 +144,6 @@ class InventoryScreen:
                 DataColumn(Text("Cost")),
                 DataColumn(Text("Date")),
                 DataColumn(Text("Edit")),
-                
             ],
             rows=[
                 DataRow(
@@ -139,17 +151,17 @@ class InventoryScreen:
                         DataCell(Text(str(item[0]))),  # ID
                         DataCell(Text(item[1])),      # Name
                         DataCell(Text(str(item[2]))), # Quantity
-                        DataCell(Text(str(item[3]))), # Price
+                        DataCell(Text(str(item[3]))), # Cost
                         DataCell(Text(item[4])),
                         DataCell(
                             Container(
                                 Row(
                                     controls=[
-                                        IconButton(icons.UPDATE, on_click=lambda e, item_id=item[0]: self.update_item(e, item_id)),
+                                        IconButton(ft.icons.UPDATE, on_click=lambda e, item_id=item[0]: self.update_item(e, item_id)),
                                         Container(width=10),
-                                        IconButton(icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
+                                        IconButton(ft.icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
                                     ],
-                                    alignment=MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.CENTER,
                                 ),
                                 padding=Padding(left=10, right=10, top=0, bottom=0)
                             )
@@ -159,7 +171,6 @@ class InventoryScreen:
                 for item in self.inventory
             ],
         )
-
 
     def build(self):
         self.load_inventory()
@@ -221,6 +232,7 @@ class InventoryScreen:
 
         # Inventory data table
         table = self.build_table()
+        self.table_container = Container(table, padding=10, expand=True)  # Store reference here
 
         # Main layout combining menu bar and content area
         layout = Row(
@@ -233,7 +245,7 @@ class InventoryScreen:
                         controls=[
                             Container(header, padding=10),
                             search_bar_row,
-                            Container(table, padding=10, expand=True),
+                            self.table_container,  # Use the stored reference
                         ],
                         expand=True,
                     ),
