@@ -2,7 +2,7 @@ import flet as ft
 
 def bill_gen(page):
 
-    global items
+    global items, filtered_items
     page.title = "Update Bill"
     page.bgcolor = "#263238"
 
@@ -21,6 +21,8 @@ def bill_gen(page):
         {"id": 2, "name": "Item 2", "quantity": 1, "price": 75.0, "status": "Unpaid"},
         {"id": 3, "name": "Item 3", "quantity": 3, "price": 20.0, "status": "Return"}
     ]
+
+    filtered_items = items.copy()
 
     def update_item(e, item_id):
         item = next((i for i in items if i["id"] == item_id), None)
@@ -107,7 +109,7 @@ def bill_gen(page):
 
     def update_item_table():
         item_table.controls.clear()
-        for item in items:
+        for item in filtered_items:
             item["container"] = ft.Container(
                 content=ft.Row(
                     controls=[
@@ -133,6 +135,12 @@ def bill_gen(page):
             item_table.controls.append(item["container"])
         page.update()
 
+    def search_items(e):
+        global filtered_items
+        query = e.control.value.lower()
+        filtered_items = [item for item in items if query in item["name"].lower() or query in str(item["id"])]
+        update_item_table()
+
     def save_item(e):
         # Implement save logic here
         page.views.pop()
@@ -142,7 +150,7 @@ def bill_gen(page):
         page.views.pop()
         page.update()
 
-    input_field = ft.Container(
+    search_field = ft.Container(
         width=300,
         height=45,
         content=ft.TextField(
@@ -152,6 +160,7 @@ def bill_gen(page):
             border_radius=ft.border_radius.all(8),
             height=50,
             text_align=ft.TextAlign.CENTER,
+            on_change=search_items,
         ),
         bgcolor="#000000",
         border_radius=10,
@@ -195,7 +204,7 @@ def bill_gen(page):
     main_container = ft.Container(
         content=ft.Column(
             controls=[
-                input_field,
+                search_field,
                 item_table,
                 save_button,
                 back_button,
