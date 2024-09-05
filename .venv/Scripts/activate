@@ -35,28 +35,20 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-# on Windows, a path can contain colons and backslashes and has to be converted:
-if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
-    # transform D:\path\to\venv to /d/path/to/venv on MSYS
-    # and to /cygdrive/d/path/to/venv on Cygwin
-    export VIRTUAL_ENV=$(cygpath "c:\GITHUB REP\flet inv\.venv")
-else
-    # use the path as-is
-    export VIRTUAL_ENV="c:\GITHUB REP\flet inv\.venv"
-fi
+# Set the VIRTUAL_ENV variable based on Windows path format
+export VIRTUAL_ENV="C:\GITHUB REP\inventory-management-desktop\.venv"
 
 _OLD_VIRTUAL_PATH="$PATH"
-PATH="$VIRTUAL_ENV/Scripts:$PATH"
+PATH="$VIRTUAL_ENV\Scripts:$PATH"
 export PATH
 
-# unset PYTHONHOME if set
-# this will fail if PYTHONHOME is set to the empty string (which is bad anyway)
-# could use `if (set -u; : $PYTHONHOME) ;` in bash
+# Unset PYTHONHOME if set
 if [ -n "${PYTHONHOME:-}" ] ; then
     _OLD_VIRTUAL_PYTHONHOME="${PYTHONHOME:-}"
     unset PYTHONHOME
 fi
 
+# Modify the prompt (PS1)
 if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
     _OLD_VIRTUAL_PS1="${PS1:-}"
     PS1="(.venv) ${PS1:-}"
@@ -65,6 +57,8 @@ if [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
     export VIRTUAL_ENV_PROMPT
 fi
 
-# Call hash to forget past commands. Without forgetting
-# past commands the $PATH changes we made may not be respected
+# Forget old command hashes
 hash -r 2> /dev/null
+
+# Run the Flet app with hot-reload
+"C:\GITHUB REP\inventory-management-desktop\.venv\Scripts\flet.exe" run -r inv_app.py

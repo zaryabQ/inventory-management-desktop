@@ -120,5 +120,23 @@ class InventoryHandler:
         finally:    
             conn.close()        
 
-    
-    
+
+    @staticmethod
+    def search_items_billing(conn, name):
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, quantity, cost FROM inventory WHERE name = ?", (name,))
+        item = cursor.fetchone()
+        return item
+
+    @staticmethod
+    def update_item_billing(conn, item_id, updates):
+        cursor = conn.cursor()
+        set_clause = ', '.join([f"{key} = ?" for key in updates.keys()])
+        values = list(updates.values()) + [item_id]
+        cursor.execute(f'''
+            UPDATE inventory
+            SET {set_clause}
+            WHERE id = ?
+        ''', values)
+        conn.commit()
+

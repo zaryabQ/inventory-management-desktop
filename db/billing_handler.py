@@ -28,7 +28,7 @@ class BillingHandler:
 
     @staticmethod
     def add_bill(name, item_list):
-        """Add a new bill to the billing table."""
+        """Add a new bill to the billing table and update inventory and bill_item."""
         if not name or not item_list:
             raise ValueError("Name and item list are required")
 
@@ -37,40 +37,81 @@ class BillingHandler:
         total_items = 0
         total_profit = 0
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
         try:
-            # Process each item in the list
-            for item in item_list:
-                item_id = item['id']
-                quantity = item['quantity']
-                selling_price = item['selling_price']
+            # Use a context manager to handle the connection
+            with get_db_connection() as conn:
+                conn.execute("PRAGMA busy_timeout = 5000")  # Set timeout to handle busy database
                 
-                # Fetch inventory item to get the cost price
-                inventory_item = InventoryHandler.search_items(item['name'])[0]  # Assuming exact match
-                cost_price = inventory_item[3]  # Assuming cost is at index 3
-                profit = (selling_price - cost_price) * quantity
+                cursor = conn.cursor()
 
-                total_items += quantity
-                total_cost += selling_price * quantity
-                total_profit += profit
+                # Start a transaction
+                cursor.execute("BEGIN TRANSACTION")
 
-                # Update inventory quantity
-                new_quantity = inventory_item[2] - quantity  # Assuming quantity is at index 2
-                if new_quantity < 0:
-                    raise ValueError(f"Not enough stock for item: {item['name']}")
-                InventoryHandler.update_item(item_id, {'quantity': new_quantity})
+                # Insert the new bill into the billing table
+                cursor.execute('''
+                    INSERT INTO billing (name, billingdate, items, total_cost, profit, status)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (name, billing_date, 0, 0, 0, 'Unpaid'))
+                
+                # Get the last inserted bill ID
+                bill_id = cursor.lastrowid
+                print(item_list)
+                # Process each item in the item list
+                for item in item_list:
+                    item_id = item['id']
+                    quantity = item['quantity']
+                    selling_price = item['selling_price']
+                    
+                    # Fetch the inventory item to get the cost price and current quantity
+                    inventory_item = InventoryHandler.search_items_billing(conn,item['name'])
+                    
+                    if not inventory_item:
+                        raise ValueError(f"Item {item['name']} not found in inventory.")
+                    
+                    cost_price = inventory_item[3]  # Assuming cost is at index 3
+                    current_inventory_quantity = inventory_item[2]  # Assuming inventory quantity is at index 2
 
-            # Insert the bill into the billing table
-            cursor.execute('''
-                INSERT INTO billing (name, billingdate, items, total_cost, profit, status)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (name, billing_date, total_items, total_cost, total_profit, 'Unpaid'))
-            conn.commit()
+                    # Calculate profit for the item
+                    profit = (selling_price - cost_price) * quantity
+
+                    # Update total items, total cost, and total profit
+                    total_items += quantity
+                    total_cost += selling_price * quantity
+                    total_profit += profit
+
+                    # Check if there is enough inventory
+                    new_quantity = current_inventory_quantity - quantity
+                    if new_quantity < 0:
+                        raise ValueError(f"Not enough stock for item: {item['name']}. Available: {current_inventory_quantity}")
+
+                    # Update inventory quantity
+                    InventoryHandler.update_item_billing(conn,inventory_item[0], {'quantity': new_quantity})
+
+                    # Insert the item into the bill_item table
+                    cursor.execute('''
+                        INSERT INTO bill_item (bill_id, item_name, quantity, price)
+                        VALUES (?, ?, ?, ?)
+                    ''', (bill_id, item['name'], quantity, selling_price))
+
+                # Update the billing table with the total items, total cost, and total profit
+                cursor.execute('''
+                    UPDATE billing
+                    SET items = ?, total_cost = ?, profit = ?
+                    WHERE id = ?
+                ''', (total_items, total_cost, total_profit, bill_id))
+
+                # Commit the transaction
+                conn.commit()
+
+                print(f"Bill {bill_id} saved successfully.")
+
         except sqlite3.Error as e:
             print(f"Error adding bill: {e}")
-        finally:
-            conn.close()
+            # Rollback if there is an error
+            conn.rollback()
+            raise e
+
+
 
     @staticmethod
     def update_bill(bill_id, update_data):

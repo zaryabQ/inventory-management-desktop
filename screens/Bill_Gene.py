@@ -1,13 +1,15 @@
 import flet as ft
+import sqlite3
+from db.billing_handler import BillingHandler
+from db.inv_handler import InventoryHandler  # Assuming this is the correct import for database operations
 
 def bill_gen(page):
-    
     global items
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
             track_color={
-                ft.MaterialState.HOVERED: "#D3D3D3",  
-                ft.MaterialState.DEFAULT: "#FFFFFF",  
+                ft.MaterialState.HOVERED: "#D3D3D3",
+                ft.MaterialState.DEFAULT: "#FFFFFF",
             },
             track_visibility=True,
             track_border_color="#D3D3D3",
@@ -26,12 +28,12 @@ def bill_gen(page):
     page.bgcolor = "#263238"
 
     heading = ft.Text(
-            "Generate Bill",
-            size=30,
-            weight=ft.FontWeight.BOLD,
-            color='#26A69A',
-            font_family="Arial",  # Set the font family to Arial (or any other available font)
-            italic=True
+        "Generate Bill",
+        size=30,
+        weight=ft.FontWeight.BOLD,
+        color='#26A69A',
+        font_family="Arial",
+        italic=True
     )
 
     items = []
@@ -40,14 +42,13 @@ def bill_gen(page):
         item = next((i for i in items if i["id"] == item_id), None)
         if not item:
             return
-        
+
         popup = ft.AlertDialog(
             modal=True,
             title=ft.Text(f"Update {item['name']}", color="#26A69A"),
             content=ft.Column([
                 ft.TextField(label="Quantity", value=str(item['quantity']), bgcolor="#FFFFFF"),
                 ft.TextField(label="Selling Price", value=str(item['price']), bgcolor="#FFFFFF"),
-            
             ]),
             actions=[
                 ft.TextButton(
@@ -66,7 +67,6 @@ def bill_gen(page):
         page.dialog = popup
         popup.open = True
         page.update()
-
 
     def update_item_details(item, content):
         global items
@@ -118,36 +118,43 @@ def bill_gen(page):
         def search_item(e):
             search_query = search_field.value.lower()
             results.controls.clear()
-            
-            # Simulated search in a list of items (Replace with your actual inventory)
-            inventory = [
-                {"id": 1, "name": "Item 1", "price": 100},
-                {"id": 2, "name": "Item 2", "price": 200},
-                {"id": 3, "name": "Item 3", "price": 300},
-            ]
-            
+
+            conn = sqlite3.connect('db/sql.db')
+            cursor = conn.cursor()
+
+            # Replace with actual search query
+            cursor.execute("SELECT * FROM inventory WHERE name LIKE ?", ('%' + search_query + '%',))
+            inventory = cursor.fetchall()
+
+            conn.close()
+
             for item in inventory:
-                if search_query in item["name"].lower():
-                    results.controls.append(
-                        ft.ListTile(
-                            title=ft.Text(item["name"]),
-                            subtitle=ft.Text(f"Price: {item['price']}"),
-                            on_click=lambda e, item=item: on_item_selected(item),
-                            bgcolor = "#FFFFFF",
-                        )
+                item_data = {
+                    "id": item[0],  # Assuming ID is at index 0
+                    "name": item[1], 
+                    "quantity": item[2], # Name at index 1
+                    "price": item[3],  # Selling price at index 2
+                }
+                results.controls.append(
+                    ft.ListTile(
+                        title=ft.Text(item_data["name"]),
+                        subtitle=ft.Text(f"Quantity: {item_data['quantity']}\nPrice: {item_data['price']}"),
+                        on_click=lambda e, item=item_data: on_item_selected(item),
+                        bgcolor="#FFFFFF",
                     )
-            
+                )
+
             page.update()
-        
+
         search_field = ft.TextField(
             label="Search Items",
             on_change=search_item,
             width=300,
-            bgcolor = "#FFFFFF",
+            bgcolor="#FFFFFF",
         )
-        
+
         results = ft.Column()
-        
+
         popup = ft.AlertDialog(
             modal=True,
             title=ft.Text("Search Items", color="#26A69A"),
@@ -164,7 +171,7 @@ def bill_gen(page):
             ],
             bgcolor="#383838",
         )
-     
+
         page.dialog = popup
         popup.open = True
         page.update()
@@ -172,12 +179,12 @@ def bill_gen(page):
     def add_item(e):
         def on_item_selected(item):
             item_id = len(items)
-            
+
             items.append(
                 {
                     "id": item_id,
                     "name": item["name"],
-                    "quantity": 1,
+                    "quantity": item["quantity"],
                     "price": item["price"],
                     "container": ft.Container(
                         content=ft.Row(
@@ -209,8 +216,77 @@ def bill_gen(page):
         show_search_popup(page, on_item_selected)
 
     def save_item(e):
-        page.views.pop()
-        page.update()
+        global items
+
+        customer_name = input_field.content.value.strip()
+
+        if not customer_name:
+            # Alert the user that the name field is empty
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text("Name field cannot be empty!"),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
+            return
+
+        if not items:
+            # Alert the user that no items have been added
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text("No items to bill!"),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
+            return
+
+        # Prepare the item list for saving (only keep relevant fields: id, name, quantity, price)
+        item_list = []
+        for item in items:
+            # Make sure to include only the required fields, ignoring 'container'
+            item_list.append({
+                'id': item['id'],          # Assuming each item has an ID
+                'name': item['name'],       # Item name
+                'quantity': item['quantity'],  # Quantity selected in the UI
+                'selling_price': item['price'],  # Selling price set in the UI
+            })
+        print("i come here")
+        try:
+            # Call the add_bill function to save the bill to the database
+            print("i come here")
+            BillingHandler.add_bill(customer_name, item_list)
+        
+            # Alert the user that the bill was saved successfully
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text("Bill saved successfully!"),
+                bgcolor="#00FF00"
+            )
+            page.snack_bar.open = True
+
+            # Clear the form for the next bill
+            items.clear()
+            update_item_table()
+            input_field.content.value = ""  # Clear the customer name input
+            page.update()
+
+        except ValueError as ve:
+            # Alert the user in case of any validation errors (e.g., insufficient stock)
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text(str(ve)),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
+
+        except Exception as e:
+            # Handle unexpected errors
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text(f"Error: {str(e)}"),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
+
 
     def go_back(e):
         page.views.pop()
@@ -296,20 +372,21 @@ def bill_gen(page):
         padding=20,
         border_radius=ft.border_radius.all(20),
     )
+
     page.views.append(
-            ft.View(
-                "/bill",
-                bgcolor="#2b3037",
-                controls=[
-                    ft.Column(
-                        controls=[
-                            ft.Container(content=heading, alignment=ft.alignment.center),
-                            ft.Container(content=main_container, alignment=ft.alignment.center),
-                        ],
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        spacing=30,
-                    )
-                ]
-            )
+        ft.View(
+            "/bill",
+            bgcolor="#2b3037",
+            controls=[
+                ft.Column(
+                    controls=[
+                        ft.Container(content=heading, alignment=ft.alignment.center),
+                        ft.Container(content=main_container, alignment=ft.alignment.center),
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=30,
+                )
+            ]
         )
+    )
     page.update()
