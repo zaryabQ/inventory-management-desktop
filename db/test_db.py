@@ -92,15 +92,15 @@ def create_billing_table():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS billing (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            billingdate TEXT NOT NULL,
-            items INTEGER NOT NULL,
-            total_cost REAL NOT NULL,
-            profit REAL NOT NULL,
-            status TEXT NOT NULL
+        CREATE TABLE bill_item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,   -- Unique identifier for each entry
+            bill_id INTEGER NOT NULL,               -- Foreign key referencing the bill ID from the billing table
+            item_name TEXT NOT NULL,                -- Name or ID of the item
+            quantity INTEGER NOT NULL,              -- Quantity of the item in the bill
+            price REAL NOT NULL,                    -- Price of the item in the bill
+            FOREIGN KEY (bill_id) REFERENCES billing(id) -- Ensures bill_id exists in the billing table
         );
+
     ''')
     conn.commit()
     conn.close()
@@ -139,10 +139,12 @@ def truncate_billing_table():
 
 # Example usage
 if __name__ == "__main__":
+    
     # drop_billing_table()  # Uncomment this line to drop the billing table if it exists
-    create_billing_table()
-    populate_billing_table()
+    # create_billing_table()
+    # populate_billing_table()
     # Uncomment the line below to delete all records
     # delete_all_billing_values()
     # Uncomment the line below to truncate the table (deletes all records and resets autoincrement)
     # truncate_billing_table()
+    pass
