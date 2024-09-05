@@ -2,6 +2,7 @@ import flet as ft
 from flet import *
 from db.billing_handler import BillingHandler  # Import the BillingDB class
 from screens.Bill_Gene import bill_gen
+from screens.update_bill import bill_updt
 from screens.utils import main_remove  # Assuming you have a remove logic in utils
 
 class BillingScreen:
@@ -54,6 +55,8 @@ class BillingScreen:
     def handle_add_bill(self, e):
         """Handle the 'Add Bill' button click."""
         bill_gen(self.page)
+        self.load_bills()
+        self.page.update()
 
     def create_menu_button(self, text, route):
         """Helper function to create menu buttons."""
@@ -72,6 +75,9 @@ class BillingScreen:
 
     def update_bill(self, e, bill_id):
         """Placeholder for bill update functionality."""
+        bill_updt(self.page , bill_id)
+        self.load_bills()
+        self.page.update()
         print(f"Update Bill with ID {bill_id}")
         # You can later add logic to open the update screen
 
@@ -83,10 +89,19 @@ class BillingScreen:
             self.page.update()  # Return to the Billing screen without removing
 
         def confirm_remove(e):
-            self.billing_db.remove_bill(bill_id)
-            self.load_bills()
+            def show_snackbar(message):
+                """Show a snackbar with the given message."""
+                # Assuming `page` is your Flet page object
+                
+                self.page.snack_bar = SnackBar(Text(f"{message}"), open=True)
+                self.page.update()
+
+            # Call remove_bill with show_snackbar function to handle alerts
+            self.billing_db.remove_bill(bill_id, show_snackbar)
+             # Assuming this refreshes the list of bills
             self.page.views.pop()
-            self.page.update()  # Refresh the billing table after removal
+            self.page.update()
+ # Refresh the billing table after removal
 
         self.page.views.append(
             View(

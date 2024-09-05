@@ -41,14 +41,9 @@ class SettingsScreen:
             self.page.update()
             return
 
-        success, message = update_user_username(current_user.username, new_username)
-
-        if success:
-            current_user.username = new_username
-            self.page.snack_bar = SnackBar(Text("Username updated successfully!"), open=True)
-        else:
-            self.page.snack_bar = SnackBar(Text(message), open=True)
-
+        message = update_user_username(current_user.username, new_username)
+        self.page.snack_bar = SnackBar(Text(f"{message}"), open=True)
+        self.page.go("/")
         self.page.update()
 
     def update_password(self, new_password):
@@ -69,14 +64,9 @@ class SettingsScreen:
             self.page.update()
             return
 
-        success, message = update_user_password(current_user.username, new_password)
-
-        if success:
-            current_user.password = new_password
-            self.page.snack_bar = SnackBar(Text("Password updated successfully!"), open=True)
-        else:
-            self.page.snack_bar = SnackBar(Text(message), open=True)
-
+        message = update_user_password(current_user.username, new_password)
+        self.page.snack_bar = SnackBar(Text(f"{message}"), open=True)
+        self.page.go("/")
         self.page.update()
 
     def build(self):

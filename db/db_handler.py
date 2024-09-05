@@ -27,10 +27,10 @@ def update_user_username(current_username, new_username):
         cursor = conn.cursor()
         cursor.execute("UPDATE Users SET username = ? WHERE username = ?", (new_username, current_username))
         conn.commit()
-        return cursor.rowcount  # Returns the number of rows updated
+        return "Username Updated Successfully"
     except sqlite3.Error as e:
         print(f"Database error: {e}")
-        return 0
+        return "Username Update Failed"
     finally:
         if conn:
             cursor.close()
@@ -43,10 +43,10 @@ def update_user_password(username, new_password):
         cursor = conn.cursor()
         cursor.execute("UPDATE Users SET password = ? WHERE username = ?", (new_password, username))
         conn.commit()
-        return cursor.rowcount  # Returns the number of rows updated
+        return "Password Updated Successfully"  # Returns the number of rows updated
     except sqlite3.Error as e:
         print(f"Database error: {e}")
-        return 0
+        return "Password Update Failed"
     finally:
         if conn:
             cursor.close()

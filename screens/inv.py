@@ -40,6 +40,8 @@ class InventoryScreen:
     def add_item(self, e):
         """Trigger the add item pop-up."""
         add_item_pop_up(self.page, self.inventory_db)
+        self.load_inventory() 
+        self.page.update()
 
     def search_item(self, e):
         """Search for items in the inventory."""
@@ -61,6 +63,9 @@ class InventoryScreen:
                 except Exception as ex:
                     print(f"Error updating item: {ex}")
             main_inv_upd(self.page, item_data, save_update)
+
+        self.load_inventory() 
+        self.page.update()
 
     def remove_item(self, e, item_id):
         """Remove an item from the inventory."""

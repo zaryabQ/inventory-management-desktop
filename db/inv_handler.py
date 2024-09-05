@@ -120,6 +120,28 @@ class InventoryHandler:
         finally:    
             conn.close()        
 
+    @staticmethod
+    def remove_item_from_inventory(conn, item_id):
+        """Remove an item from the inventory by its ID."""
+        try:
+            cursor = conn.cursor()
+            
+            # Delete the item from the inventory table
+            cursor.execute('''
+                DELETE FROM inventory
+                WHERE id = ?
+            ''', (item_id,))
+            
+            # Commit the transaction
+            conn.commit()
+            
+            print(f"Item with ID {item_id} removed from inventory.")
+        
+        except sqlite3.Error as e:
+            print(f"Error removing item from inventory: {e}")
+            # Rollback if there is an error
+            conn.rollback()
+            raise e
 
     @staticmethod
     def search_items_billing(conn, name):
@@ -139,4 +161,5 @@ class InventoryHandler:
             WHERE id = ?
         ''', values)
         conn.commit()
+
 
