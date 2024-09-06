@@ -377,7 +377,7 @@ class BillingHandler:
             return None
         
     @staticmethod
-    def save_bill_changes(bill_id, updated_items, status):
+    def save_bill_changes(bill_id, updated_items, status ,name_fi):
         """Update bill details, including item quantities, prices, and status."""
         if not updated_items:
             raise ValueError("No items to update.")
@@ -471,9 +471,9 @@ class BillingHandler:
                 # Update billing table with new values and status
                 cursor.execute("""
                     UPDATE billing
-                    SET total_cost = ?, items = ?, profit = ?, status = ?
+                    SET name = ?, total_cost = ?, items = ?, profit = ?, status = ?
                     WHERE id = ?
-                """, (total_cost, total_items, total_profit, status, bill_id))
+                """, (name_fi,total_cost, total_items, total_profit, status, bill_id))
 
                 # Commit the transaction
                 conn.commit()

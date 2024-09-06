@@ -123,10 +123,11 @@ def bill_updt(page, bill_id):
 
         # Retrieve selected status from the dropdown
         bill_status = bill_status_dropdown.value
+        name = name_field.value
 
         try:
             # Call the function to save changes, including status
-            BillingHandler.save_bill_changes(bill_id, updated_items, bill_status)
+            BillingHandler.save_bill_changes(bill_id, updated_items, bill_status, name)
 
             # Clear the removal list after saving
             items_to_remove.clear()
@@ -155,10 +156,7 @@ def bill_updt(page, bill_id):
         color="#000000",
     )
 
-    search_field = ft.Container(
-        width=300,
-        height=45,
-        content=ft.TextField(
+    name_field = ft.TextField(
             label="Enter Name/ID",
             value=bill_name,
             bgcolor="#FFFFFF",
@@ -166,6 +164,12 @@ def bill_updt(page, bill_id):
             border_radius=ft.border_radius.all(8),
             height=50,
             text_align=ft.TextAlign.CENTER,
+    )
+
+    search_field = ft.Container(
+        width=300,
+        height=45,
+        content=(name_field
         ),
         bgcolor="#000000",
         border_radius=10,

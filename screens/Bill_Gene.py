@@ -266,7 +266,8 @@ def bill_gen(page):
             # Clear the form for the next bill
             items.clear()
             update_item_table()
-            input_field.content.value = ""  # Clear the customer name input
+            input_field.content.value = ""
+            page.views.pop()  # Clear the customer name input
             page.update()
 
         except ValueError as ve:
