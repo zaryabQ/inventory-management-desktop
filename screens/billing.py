@@ -11,6 +11,27 @@ class BillingScreen:
         self.billing_db = BillingHandler()  # Instantiate the BillingDB class
         self.table_container = None  # Initialize a reference for the table container
 
+        # Set the custom scrollbar theme
+        self.page.theme = ft.Theme(
+            scrollbar_theme=ft.ScrollbarTheme(
+                track_color={
+                    ft.MaterialState.HOVERED: "#D3D3D3",
+                    ft.MaterialState.DEFAULT: "#FFFFFF",
+                },
+                track_visibility=True,
+                track_border_color="#D3D3D3",
+                thumb_visibility=True,
+                thumb_color={
+                    ft.MaterialState.HOVERED: "#A9A9A9",
+                    ft.MaterialState.DEFAULT: "#696969",
+                },
+                thickness=10,
+                radius=10,
+                main_axis_margin=50,
+                cross_axis_margin=10,
+            )
+        )
+
     def load_bills(self):
         """Load all bills from the database."""
         try:
@@ -33,7 +54,6 @@ class BillingScreen:
     def handle_add_bill(self, e):
         """Handle the 'Add Bill' button click."""
         bill_gen(self.page)
-
 
     def create_menu_button(self, text, route):
         """Helper function to create menu buttons."""
@@ -129,6 +149,7 @@ class BillingScreen:
 
     def build_table(self):
         """Build the billing table."""
+        
         return DataTable(
             columns=[
                 DataColumn(Text("Name/ID")),
@@ -142,25 +163,42 @@ class BillingScreen:
             rows=[
                 DataRow(
                     cells=[
-                        DataCell(Text(bill[1])),  # Name/ID
-                        DataCell(Text(bill[2])),  # Billing Date
-                        DataCell(Text(bill[3])),  # Items
-                        DataCell(Text(f"${bill[4]:.2f}")),  # Total Cost
-                        DataCell(Text(f"${bill[5]:.2f}")),  # Profit
-                        DataCell(Text(bill[6])),  # Status
-                        DataCell(
-                            Container(
-                                Row(
-                                    controls=[
-                                        IconButton(icons.UPDATE, on_click=lambda e, id=bill[0]: self.update_bill(e, id)),
-                                        Container(width=10),
-                                        IconButton(icons.DELETE, on_click=lambda e, id=bill[0]: self.remove_bill(e, id)),
-                                    ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                                padding=Padding(left=10, right=10, top=0, bottom=0)
-                            )
-                        ),
+                        DataCell(Container(
+                            Text(bill[1]),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                            
+                        )),  # Name/ID
+                        DataCell(Container(
+                            Text(bill[2]),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Billing Date
+                        DataCell(Container(
+                            Text(bill[3]),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Items
+                        DataCell(Container(
+                            Text(f"Rs: {bill[4]:.2f}"),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Total Cost
+                        DataCell(Container(
+                            Text(f"Rs: {bill[5]:.2f}"),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Profit
+                        DataCell(Container(
+                            Text(bill[6]),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Status
+                        DataCell(Container(
+                            Row(
+                                controls=[
+                                    IconButton(icons.UPDATE, on_click=lambda e, id=bill[0]: self.update_bill(e, id)),
+                                    IconButton(icons.DELETE, on_click=lambda e, id=bill[0]: self.remove_bill(e, id)),
+                                ],
+                                alignment=ft.MainAxisAlignment.START,
+                                spacing=10,  # Consistent spacing
+                            ),
+                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
+                        )),  # Actions
                     ]
                 )
                 for bill in self.bills
@@ -225,9 +263,14 @@ class BillingScreen:
             alignment=MainAxisAlignment.SPACE_BETWEEN,
         )
 
-        # Billing data table
+        # Billing data table with scroll support
         table = self.build_table()
-        self.table_container = Container(table, padding=10, expand=True)  # Store reference here
+        scrollable_table = Container(
+            content=ListView(controls=[table], expand=True),
+            padding=10,
+            expand=True
+        )
+        self.table_container = scrollable_table  # Store reference here
 
         # Main layout combining menu bar and content area
         layout = Row(

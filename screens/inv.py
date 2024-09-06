@@ -62,7 +62,6 @@ class InventoryScreen:
                     print(f"Error updating item: {ex}")
             main_inv_upd(self.page, item_data, save_update)
 
-
     def remove_item(self, e, item_id):
         """Remove an item from the inventory."""
         def cancel_remove(e):
@@ -153,18 +152,18 @@ class InventoryScreen:
                         DataCell(Text(item[1])),      # Name
                         DataCell(Text(str(item[2]))), # Quantity
                         DataCell(Text(str(item[3]))), # Cost
-                        DataCell(Text(item[4])),
+                        DataCell(Text(item[4])),      # Date
                         DataCell(
                             Container(
                                 Row(
                                     controls=[
                                         IconButton(ft.icons.UPDATE, on_click=lambda e, item_id=item[0]: self.update_item(e, item_id)),
-                                        Container(width=10),
                                         IconButton(ft.icons.DELETE, on_click=lambda e, item_id=item[0]: self.remove_item(e, item_id)),
                                     ],
-                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    alignment=ft.MainAxisAlignment.START,  # Align buttons to the start (left)
+                                    spacing=10,  # Adjust spacing between buttons
                                 ),
-                                padding=Padding(left=10, right=10, top=0, bottom=0)
+                                padding=Padding(left=0, right=10, top=0, bottom=0)  # Adjust padding if needed
                             )
                         ),
                     ]
@@ -233,7 +232,14 @@ class InventoryScreen:
 
         # Inventory data table
         table = self.build_table()
-        self.table_container = Container(table, padding=10, expand=True)  # Store reference here
+        self.table_container = Container(table, padding=10, expand=True)
+
+        # Scrollable inventory container with custom scrollbar theme
+        scrollable_inventory = Container(
+            content=ListView(controls=[self.table_container], expand=True),
+            padding=10,
+            expand=True
+        )
 
         # Main layout combining menu bar and content area
         layout = Row(
@@ -246,13 +252,34 @@ class InventoryScreen:
                         controls=[
                             Container(header, padding=10),
                             search_bar_row,
-                            self.table_container,  # Use the stored reference
+                            scrollable_inventory,  # Use the scrollable container
                         ],
                         expand=True,
                     ),
                     expand=True,
                 ),
             ],
+        )
+
+        # Set the custom scrollbar theme
+        self.page.theme = ft.Theme(
+            scrollbar_theme=ft.ScrollbarTheme(
+                track_color={
+                    ft.MaterialState.HOVERED: "#D3D3D3",
+                    ft.MaterialState.DEFAULT: "#FFFFFF",
+                },
+                track_visibility=True,
+                track_border_color="#D3D3D3",
+                thumb_visibility=True,
+                thumb_color={
+                    ft.MaterialState.HOVERED: "#A9A9A9",
+                    ft.MaterialState.DEFAULT: "#696969",
+                },
+                thickness=10,
+                radius=10,
+                main_axis_margin=50,
+                cross_axis_margin=10,
+            )
         )
 
         return layout
