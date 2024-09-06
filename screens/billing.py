@@ -39,9 +39,10 @@ class BillingScreen:
             self.bills = self.billing_db.load_billing()
             if self.bills is None:
                 self.bills = []  # Safeguard against None
-            self.refresh_table()
+            self.refresh_table()  # Refresh the table after loading
         except Exception as e:
             print(f"Error loading bills: {e}")
+
 
     def search_bills(self, e):
         """Search for bills in the database."""
@@ -157,15 +158,17 @@ class BillingScreen:
     def refresh_table(self):
         """Refresh the table to reflect the current bills."""
         if self.table_container:
-            self.table_container.content = self.build_table()
-            self.page.update()
+            self.table_container.content.controls.clear()  # Clear current controls
+            self.table_container.content.controls.append(self.build_table())  # Rebuild the table
+            self.page.update()  # Update the page to reflect changes
         else:
             print("Error: Table container reference not found.")
 
+
     def build_table(self):
         """Build the billing table."""
-        
         return DataTable(
+            expand=True,
             columns=[
                 DataColumn(Text("Name/ID")),
                 DataColumn(Text("Billing Date")),
@@ -178,47 +181,27 @@ class BillingScreen:
             rows=[
                 DataRow(
                     cells=[
-                        DataCell(Container(
-                            Text(bill[1]),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                            
-                        )),  # Name/ID
-                        DataCell(Container(
-                            Text(bill[2]),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Billing Date
-                        DataCell(Container(
-                            Text(bill[3]),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Items
-                        DataCell(Container(
-                            Text(f"Rs: {bill[4]:.2f}"),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Total Cost
-                        DataCell(Container(
-                            Text(f"Rs: {bill[5]:.2f}"),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Profit
-                        DataCell(Container(
-                            Text(bill[6]),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Status
-                        DataCell(Container(
+                        DataCell(Container(Text(bill[1]), padding=10)),  # Name/ID
+                        DataCell(Container(Text(bill[2]), padding=10)),  # Billing Date
+                        DataCell(Container(Text(bill[3]), padding=10)),  # Items
+                        DataCell(Container(Text(f"Rs: {bill[4]:.2f}"), padding=10)),  # Total Cost
+                        DataCell(Container(Text(f"Rs: {bill[5]:.2f}"), padding=10)),  # Profit
+                        DataCell(Container(Text(bill[6]), padding=10)),  # Status
+                        DataCell(
                             Row(
                                 controls=[
                                     IconButton(icons.UPDATE, on_click=lambda e, id=bill[0]: self.update_bill(e, id)),
                                     IconButton(icons.DELETE, on_click=lambda e, id=bill[0]: self.remove_bill(e, id)),
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
-                                spacing=10,  # Consistent spacing
                             ),
-                            padding=Padding(left=20, right=20, top=10, bottom=10)  # Consistent padding
-                        )),  # Actions
+                        ),  # Actions
                     ]
                 )
                 for bill in self.bills
             ],
         )
+
 
     def build(self):
         self.load_bills()

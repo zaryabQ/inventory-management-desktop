@@ -125,7 +125,7 @@ class HomeScreen:
         # Right side content
         content_area = Container(
             expand=True,
-            bgcolor="#2C2C2C",
+            bgcolor="#2b3037",
             padding=25,
             content=Column(
                 horizontal_alignment=CrossAxisAlignment.CENTER,
