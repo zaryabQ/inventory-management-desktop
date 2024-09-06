@@ -73,17 +73,17 @@ def bill_gen(page):
         quantity = int(content.controls[0].value)
         price = float(content.controls[1].value)
 
-        # Update the item's data
+        # Update the item's quantity and price in the bill
         item['quantity'] = quantity
         item['price'] = price
 
-        # Update the item's container in the list
+        # Update the item's container in the list to reflect new values
         item["container"] = ft.Container(
             content=ft.Row(
                 controls=[
                     ft.Text(item["name"], width=150, color="#000000", text_align=ft.TextAlign.CENTER),
-                    ft.Text(str(item["quantity"]), width=50, color="#000000", text_align=ft.TextAlign.CENTER),
-                    ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER),
+                    ft.Text(str(item["quantity"]), width=50, color="#000000", text_align=ft.TextAlign.CENTER),  # Updated quantity
+                    ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER),    # Updated price
                     ft.IconButton(
                         icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
                         icon_color="#000000",
@@ -102,6 +102,7 @@ def bill_gen(page):
 
         # Update the item table to reflect the changes
         update_item_table()
+
 
     def remove_item(item_id):
         global items
@@ -178,14 +179,17 @@ def bill_gen(page):
 
     def add_item(e):
         def on_item_selected(item):
-            item_id = len(items)
+            # Use the correct item_id from the database
+            item_id = item["id"]  # This is the actual ID from the database
 
             items.append(
                 {
-                    "id": item_id,
+                    "id": item_id,  # Store the correct item_id here
                     "name": item["name"],
-                    "quantity": item["quantity"],
+                    "quantity": 1,  # Start with quantity 1
                     "price": item["price"],
+
+                    # The container remains the same
                     "container": ft.Container(
                         content=ft.Row(
                             controls=[
@@ -196,7 +200,7 @@ def bill_gen(page):
                                     icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
                                     icon_color="#000000",
                                     tooltip="Update",
-                                    on_click=lambda e, item_id=item_id: update_item(e, item_id)
+                                    on_click=lambda e, item_id=item_id: update_item(e, item_id)  # Use the correct ID
                                 ),
                             ],
                             spacing=10,
@@ -214,6 +218,8 @@ def bill_gen(page):
             page.update()
 
         show_search_popup(page, on_item_selected)
+
+
 
     def save_item(e):
         global items
@@ -250,12 +256,11 @@ def bill_gen(page):
                 'quantity': item['quantity'],  # Quantity selected in the UI
                 'selling_price': item['price'],  # Selling price set in the UI
             })
-        print("i come here")
+
         try:
             # Call the add_bill function to save the bill to the database
-            print("i come here")
             BillingHandler.add_bill(customer_name, item_list)
-        
+
             # Alert the user that the bill was saved successfully
             page.snack_bar = ft.SnackBar(
                 content=ft.Text("Bill saved successfully!"),
@@ -266,8 +271,8 @@ def bill_gen(page):
             # Clear the form for the next bill
             items.clear()
             update_item_table()
-            input_field.content.value = ""
-            page.views.pop()  # Clear the customer name input
+            input_field.content.value = "" 
+            page.views.pop() # Clear the customer name input
             page.update()
 
         except ValueError as ve:
@@ -287,7 +292,6 @@ def bill_gen(page):
             )
             page.snack_bar.open = True
             page.update()
-
 
     def go_back(e):
         page.views.pop()

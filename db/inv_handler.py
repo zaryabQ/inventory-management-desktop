@@ -152,14 +152,22 @@ class InventoryHandler:
 
     @staticmethod
     def update_item_billing(conn, item_id, updates):
+        """
+        Updates the inventory item for a specific item_id with the provided updates.
+        In this case, it specifically updates the quantity of the item.
+        """
         cursor = conn.cursor()
-        set_clause = ', '.join([f"{key} = ?" for key in updates.keys()])
-        values = list(updates.values()) + [item_id]
-        cursor.execute(f'''
-            UPDATE inventory
-            SET {set_clause}
-            WHERE id = ?
-        ''', values)
+
+        # Ensure the 'updates' dictionary contains the 'quantity' field
+        if 'quantity' in updates:
+            cursor.execute('''
+                UPDATE inventory
+                SET quantity = ?
+                WHERE id = ?
+            ''', (updates['quantity'], item_id))
+        
+        # Commit the update to the database
         conn.commit()
+
 
 
