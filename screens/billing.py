@@ -175,18 +175,22 @@ class BillingScreen:
                 DataColumn(Text("Items")),
                 DataColumn(Text("Total Cost")),
                 DataColumn(Text("Profit")),
+                DataColumn(Text("Paid")),
+                DataColumn(Text("Remaining")),
                 DataColumn(Text("Status")),
                 DataColumn(Text("Actions")),
             ],
             rows=[
                 DataRow(
                     cells=[
-                        DataCell(Container(Text(bill[1]), padding=10)),  # Name/ID
-                        DataCell(Container(Text(bill[2]), padding=10)),  # Billing Date
-                        DataCell(Container(Text(bill[3]), padding=10)),  # Items
-                        DataCell(Container(Text(f"Rs: {bill[4]:.2f}"), padding=10)),  # Total Cost
-                        DataCell(Container(Text(f"Rs: {bill[5]:.2f}"), padding=10)),  # Profit
-                        DataCell(Container(Text(bill[6]), padding=10)),  # Status
+                        DataCell(Text(bill[1])),  # Name/ID
+                        DataCell(Text(bill[2])),  # Billing Date
+                        DataCell(Text(bill[3])),  # Items
+                        DataCell(Text(f"Rs: {bill[4]:.2f}")),  # Total Cost
+                        DataCell(Text(f"Rs: {bill[5]:.2f}")),  # Profit
+                        DataCell(Text(f"Rs: {bill[7]:.2f}")),
+                        DataCell(Text(f"Rs: {bill[8]:.2f}")),
+                        DataCell(Text(bill[6])),  # Status
                         DataCell(
                             Row(
                                 controls=[
