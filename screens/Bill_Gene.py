@@ -1,9 +1,10 @@
 import flet as ft
 import sqlite3
 from db.billing_handler import BillingHandler
+
 from db.inv_handler import InventoryHandler  # Assuming this is the correct import for database operations
 
-def bill_gen(page):
+def bill_gen(page ,load_bills_callback):
     global items, total_amount, paid_amount, remaining_amount
     
     items = []
@@ -263,6 +264,7 @@ def bill_gen(page):
             paid_input.value = "0"
             calculate_totals()
             page.views.pop()
+            load_bills_callback()
             page.update()
 
         except ValueError as ve:

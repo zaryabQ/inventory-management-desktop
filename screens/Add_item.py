@@ -2,7 +2,7 @@ import flet as ft
 from flet import *
 from db.inv_handler import InventoryHandler
 
-def add_item_pop_up(page, inventory_db):
+def add_item_pop_up(page, inventory_db, load_inv_callback):
 
     def show_snackbar(message):
         """Helper function to show a snackbar with a message."""
@@ -59,7 +59,7 @@ def add_item_pop_up(page, inventory_db):
             buy_price.value = ""
             # Close the pop-up
             page.views.pop()
-            page.go('/Inventory')
+            load_inv_callback()
             page.update()
         except ValueError as ve:
             show_snackbar(str(ve))

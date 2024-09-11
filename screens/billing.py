@@ -55,7 +55,7 @@ class BillingScreen:
 
     def handle_add_bill(self, e):
         """Handle the 'Add Bill' button click."""
-        bill_gen(self.page)
+        bill_gen(self.page,self.load_bills)
         self.load_bills()
         self.page.update()
 
@@ -76,7 +76,7 @@ class BillingScreen:
 
     def update_bill(self, e, bill_id):
         """Placeholder for bill update functionality."""
-        bill_updt(self.page , bill_id)
+        bill_updt(self.page , bill_id, self.load_bills)
         self.load_bills()
         self.page.update()
         print(f"Update Bill with ID {bill_id}")
@@ -101,6 +101,7 @@ class BillingScreen:
             self.billing_db.remove_bill(bill_id, show_snackbar)
              # Assuming this refreshes the list of bills
             self.page.views.pop()
+            self.load_bills()
             self.page.update()
  # Refresh the billing table after removal
 

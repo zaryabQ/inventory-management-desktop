@@ -1,7 +1,7 @@
 import flet as ft
 from db.billing_handler import BillingHandler
 
-def bill_updt(page, bill_id):
+def bill_updt(page, bill_id, load_bill_callback):
     global items, filtered_items, items_to_remove ,total_amount,remaining_amount,paid_amount
 
     # Fetch items from the bill_item table using the bill_id
@@ -152,6 +152,7 @@ def bill_updt(page, bill_id):
 
             # Go back after saving
             page.views.pop()
+            load_bill_callback()
             page.update()
             
         except ValueError as ve:
