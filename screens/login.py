@@ -72,7 +72,7 @@ class LoginScreen:
         left_side = Container(
             bgcolor=colors.BLUE_GREY_900,
             content=Image(
-                src="png/mariana-proenca-_h0xG4s6NFg-unsplash.jpg",
+                src="png/—Pngtree—solar panels logo house and_5299554.png",
                 fit=ImageFit.COVER,
                 expand=True
             ),
