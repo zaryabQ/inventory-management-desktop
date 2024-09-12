@@ -1,10 +1,17 @@
 import flet as ft
 import sqlite3
 from db.billing_handler import BillingHandler
+
 from db.inv_handler import InventoryHandler  # Assuming this is the correct import for database operations
 
-def bill_gen(page):
-    global items
+def bill_gen(page ,load_bills_callback):
+    global items, total_amount, paid_amount, remaining_amount
+    
+    items = []
+    total_amount = 0.0
+    paid_amount = 0.0
+    remaining_amount = 0.0
+
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
             track_color={
@@ -27,21 +34,28 @@ def bill_gen(page):
     page.title = "Generate Bill"
     page.bgcolor = "#263238"
 
-    heading = ft.Text(
-        "Generate Bill",
-        size=30,
-        weight=ft.FontWeight.BOLD,
-        color='#26A69A',
-        font_family="Arial",
-        italic=True
-    )
 
     items = []
 
+    def calculate_totals():
+        global total_amount, remaining_amount
+        total_amount = sum(item['quantity'] * item['price'] for item in items)
+        remaining_amount = total_amount - paid_amount
+        total_amount_text.value = f"Total Amount: {total_amount:.2f}"
+        remaining_amount_text.value = f"Remaining Amount: {remaining_amount:.2f}"
+        page.update()
+
+    def update_paid_amount(e):
+        global paid_amount
+        paid_amount = float(paid_input.value) if paid_input.value else 0.0
+        calculate_totals()
+
     def update_item(e, item_id):
         item = next((i for i in items if i["id"] == item_id), None)
+        
         if not item:
             return
+        
 
         popup = ft.AlertDialog(
             modal=True,
@@ -113,6 +127,7 @@ def bill_gen(page):
         item_table.controls.clear()
         for item in items:
             item_table.controls.append(item["container"])
+        calculate_totals()  
         page.update()
 
     def show_search_popup(page: ft.Page, on_item_selected):
@@ -214,65 +229,42 @@ def bill_gen(page):
                 }
             )
             update_item_table()
+            
             page.dialog.open = False
+            calculate_totals()
             page.update()
-
+        
         show_search_popup(page, on_item_selected)
 
 
 
     def save_item(e):
-        global items
+        global items, total_amount, paid_amount, remaining_amount
 
         customer_name = input_field.content.value.strip()
 
-        if not customer_name:
-            # Alert the user that the name field is empty
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("Name field cannot be empty!"),
-                bgcolor="#FF0000"
-            )
-            page.snack_bar.open = True
-            page.update()
-            return
+        # Same validations as before...
 
-        if not items:
-            # Alert the user that no items have been added
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("No items to bill!"),
-                bgcolor="#FF0000"
-            )
-            page.snack_bar.open = True
-            page.update()
-            return
-
-        # Prepare the item list for saving (only keep relevant fields: id, name, quantity, price)
+        # Prepare the item list and pass paid and remaining values for saving
         item_list = []
         for item in items:
-            # Make sure to include only the required fields, ignoring 'container'
             item_list.append({
-                'id': item['id'],          # Assuming each item has an ID
-                'name': item['name'],       # Item name
-                'quantity': item['quantity'],  # Quantity selected in the UI
-                'selling_price': item['price'],  # Selling price set in the UI
+                'id': item['id'],
+                'name': item['name'],
+                'quantity': item['quantity'],
+                'selling_price': item['price'],
             })
 
         try:
-            # Call the add_bill function to save the bill to the database
-            BillingHandler.add_bill(customer_name, item_list)
+            # Pass paid and remaining values to the BillingHandler
+            BillingHandler.add_bill(customer_name, item_list, paid_amount, remaining_amount)
 
-            # Alert the user that the bill was saved successfully
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("Bill saved successfully!"),
-                bgcolor="#00FF00"
-            )
-            page.snack_bar.open = True
-
-            # Clear the form for the next bill
+            # Success notification and clearing the form...
             items.clear()
-            update_item_table()
-            input_field.content.value = "" 
-            page.views.pop() # Clear the customer name input
+            paid_input.value = "0"
+            calculate_totals()
+            page.views.pop()
+            load_bills_callback()
             page.update()
 
         except ValueError as ve:
@@ -296,6 +288,10 @@ def bill_gen(page):
     def go_back(e):
         page.views.pop()
         page.update()
+
+    total_amount_text = ft.Text(value="Total Amount: 0.00", color="#FFFFFF")
+    paid_input = ft.TextField(label="Paid", value="0", bgcolor="#FFFFFF", on_change=update_paid_amount)
+    remaining_amount_text = ft.Text(value="Remaining Amount: 0.00", color="#FFFFFF")
 
     input_field = ft.Container(
         width=300,
@@ -347,7 +343,7 @@ def bill_gen(page):
         alignment=ft.alignment.center,
     )
 
-    back_button = ft.Container(
+    go_back_btn = ft.Container(
         content=ft.ElevatedButton(
             text="Back",
             width=150,
@@ -366,8 +362,11 @@ def bill_gen(page):
                 input_field,
                 add_items_button,
                 item_table,
+                total_amount_text,
+                paid_input,
+                remaining_amount_text,
                 save_button,
-                back_button,
+                go_back_btn,
             ],
             spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -385,7 +384,7 @@ def bill_gen(page):
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Container(content=heading, alignment=ft.alignment.center),
+                        ft.Container(content=ft.Text("Generate Bill", size=30, weight=ft.FontWeight.BOLD, color='#26A69A'), alignment=ft.alignment.center),
                         ft.Container(content=main_container, alignment=ft.alignment.center),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,

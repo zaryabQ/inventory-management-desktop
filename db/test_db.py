@@ -144,7 +144,7 @@ if __name__ == "__main__":
     # create_billing_table()
     # populate_billing_table()
     # Uncomment the line below to delete all records
-    # delete_all_billing_values()
+    delete_all_billing_values()
     # Uncomment the line below to truncate the table (deletes all records and resets autoincrement)
     # truncate_billing_table()
     pass

@@ -27,7 +27,7 @@ class BillingHandler:
         return InventoryHandler.search_items(keyword)
 
     @staticmethod
-    def add_bill(name, item_list):
+    def add_bill(name, item_list, paid_amt, rem_amt):
         """Add a new bill to the billing table and update inventory and bill_item."""
         if not name or not item_list:
             raise ValueError("Name and item list are required")
@@ -49,9 +49,9 @@ class BillingHandler:
 
                 # Insert the new bill into the billing table
                 cursor.execute('''
-                    INSERT INTO billing (name, billingdate, items, total_cost, profit, status)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (name, billing_date, 0, 0, 0, 'Unpaid'))
+                    INSERT INTO billing (name, billingdate, items, total_cost, profit, status, paid, remaining)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (name, billing_date, 0, 0, 0, 'Unpaid', paid_amt, rem_amt))
                 
                 # Get the last inserted bill ID
                 bill_id = cursor.lastrowid
@@ -99,16 +99,28 @@ class BillingHandler:
                     ''', (bill_id, item['name'], quantity, selling_price))
 
                 # Update the billing table with the total items, total cost, and total profit
-                cursor.execute('''
-                    UPDATE billing
-                    SET items = ?, total_cost = ?, profit = ?
-                    WHERE id = ?
-                ''', (total_items, total_cost, total_profit, bill_id))
+                if total_cost == paid_amt:
+                    cursor.execute('''
+                        UPDATE billing
+                        SET items = ?, total_cost = ?, profit = ?, status = ?
+                        WHERE id = ?
+                    ''', (total_items, total_cost, total_profit,'Paid', bill_id))
 
-                # Commit the transaction
-                conn.commit()
+                    # Commit the transaction
+                    conn.commit()
 
-                print(f"Bill {bill_id} saved successfully.")
+                    print(f"Bill {bill_id} saved successfully.")
+                else:
+                    cursor.execute('''
+                        UPDATE billing
+                        SET items = ?, total_cost = ?, profit = ?
+                        WHERE id = ?
+                    ''', (total_items, total_cost, total_profit, bill_id))
+
+                    # Commit the transaction
+                    conn.commit()
+
+                    print(f"Bill {bill_id} saved successfully.")
 
         except sqlite3.Error as e:
             print(f"Error adding bill: {e}")
@@ -357,7 +369,7 @@ class BillingHandler:
         cursor = conn.cursor()
 
         # Fetch the bill details (you can add more fields if needed)
-        query = "SELECT id, name FROM billing WHERE id = ?"
+        query = "SELECT id, name, total_cost, paid, remaining FROM billing WHERE id = ?"
         cursor.execute(query, (bill_id,))
 
         # Fetch one row of result (assuming bill_id is unique)
@@ -370,14 +382,17 @@ class BillingHandler:
         if result:
             return {
                 'id': result[0],    # Bill ID
-                'name': result[1]   # Bill Name
+                'name': result[1], # Bill Name
+                'total':result[2],  
+                'paid_amt': result[3],
+                'rem_amt': result[4]
             }
         else:
             # If no result, return None or handle it as needed
             return None
         
     @staticmethod
-    def save_bill_changes(bill_id, updated_items, status ,name_fi):
+    def save_bill_changes(bill_id, updated_items, status, name_fi, paid_amt, rem_amt):
         """Update bill details, including item quantities, prices, and status."""
         if not updated_items:
             raise ValueError("No items to update.")
@@ -415,9 +430,21 @@ class BillingHandler:
                         inventory_id, current_inventory_quantity = inventory_item
                         quantity_difference = new_quantity - current_quantities.get(item_name, 0)
 
-                        # Update inventory quantity
-                        updated_inventory_quantity = current_inventory_quantity - quantity_difference
-                        cursor.execute("UPDATE inventory SET quantity = ? WHERE id = ?", (updated_inventory_quantity, inventory_id))
+
+                        if quantity_difference < 0:
+                            updated_inventory_quantity = current_inventory_quantity - quantity_difference
+                            cursor.execute("UPDATE inventory SET quantity = ? WHERE id = ?", (updated_inventory_quantity, inventory_id))
+                        else:
+                            if quantity_difference == current_inventory_quantity:
+                                InventoryHandler.remove_item_from_inventory(conn, inventory_id)
+
+                            elif quantity_difference > current_inventory_quantity:
+                                raise ValueError(f"Not enough stock for item: {item['name']}. Available: {current_inventory_quantity}")
+                            
+                            else: 
+                                updated_inventory_quantity = current_inventory_quantity - quantity_difference
+                                cursor.execute("UPDATE inventory SET quantity = ? WHERE id = ?", (updated_inventory_quantity, inventory_id))
+
                         
                         # Check if item exists in bill_item and update or insert accordingly
                         cursor.execute("SELECT id FROM bill_item WHERE bill_id = ? AND item_name = ?", (bill_id, item_name))
@@ -471,9 +498,9 @@ class BillingHandler:
                 # Update billing table with new values and status
                 cursor.execute("""
                     UPDATE billing
-                    SET name = ?, total_cost = ?, items = ?, profit = ?, status = ?
+                    SET name = ?, total_cost = ?, items = ?, profit = ?, status = ?, paid = ?, remaining = ?
                     WHERE id = ?
-                """, (name_fi,total_cost, total_items, total_profit, status, bill_id))
+                """, (name_fi,total_cost, total_items, total_profit, status, paid_amt, rem_amt, bill_id))
 
                 # Commit the transaction
                 conn.commit()

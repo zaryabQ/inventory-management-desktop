@@ -1,15 +1,30 @@
 import flet as ft
 from db.billing_handler import BillingHandler
 
-def bill_updt(page, bill_id):
-    global items, filtered_items, items_to_remove
+def bill_updt(page, bill_id, load_bill_callback):
+    global items, filtered_items, items_to_remove ,total_amount,remaining_amount,paid_amount
 
     # Fetch items from the bill_item table using the bill_id
     items = BillingHandler.fetch_bill_items(bill_id)
     bill_detail = BillingHandler.fetch_bill_details(bill_id)
     filtered_items = items.copy()
     bill_name = bill_detail["name"]
+    total_amount = bill_detail["total"]
+    paid_amount = bill_detail["paid_amt"]
+    remaining_amount = bill_detail["rem_amt"]
 
+    def calculate_totals():
+        global total_amount, remaining_amount
+        total_amount = sum(item['quantity'] * item['price'] for item in items)
+        remaining_amount = total_amount - paid_amount
+        total_amount_text.value = f"Total Amount: {total_amount:.2f}"
+        remaining_amount_text.value = f"Remaining Amount: {remaining_amount:.2f}"
+        page.update()
+
+    def update_paid_amount(e):
+        global paid_amount
+        paid_amount = float(paid_input.value) if paid_input.value else 0.0
+        calculate_totals()
     # Track items marked for removal
     items_to_remove = []
 
@@ -91,6 +106,7 @@ def bill_updt(page, bill_id):
                 margin=ft.margin.symmetric(vertical=3),
             )
             item_table.controls.append(item["container"])
+        calculate_totals()
         page.update()
 
     def save_bill(e):
@@ -124,27 +140,49 @@ def bill_updt(page, bill_id):
         # Retrieve selected status from the dropdown
         bill_status = bill_status_dropdown.value
         name = name_field.value
+        
+
 
         try:
             # Call the function to save changes, including status
-            BillingHandler.save_bill_changes(bill_id, updated_items, bill_status, name)
+            BillingHandler.save_bill_changes(bill_id, updated_items, bill_status, name, paid_amount, remaining_amount)
 
             # Clear the removal list after saving
             items_to_remove.clear()
 
             # Go back after saving
             page.views.pop()
+            load_bill_callback()
             page.update()
             
-        except Exception as ex:
-            print(f"Failed to save bill changes: {ex}")
-            # Handle exceptions or show error messages as needed
+        except ValueError as ve:
+            # Alert the user in case of any validation errors (e.g., insufficient stock)
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text(str(ve)),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
+
+        except Exception as e:
+            # Handle unexpected errors
+            page.snack_bar = ft.SnackBar(
+                content=ft.Text(f"Error: {str(e)}"),
+                bgcolor="#FF0000"
+            )
+            page.snack_bar.open = True
+            page.update()
 
     def go_back(e):
         page.views.pop()
         page.update()
 
-        
+
+
+    total_amount_text = ft.Text(value=f"Total Amount: {total_amount:.2f}", color="#FFFFFF")
+    paid_input = ft.TextField(label=f"Paid Amount", value=paid_amount, bgcolor="#FFFFFF", on_change=update_paid_amount)
+    remaining_amount_text = ft.Text(value=f"Remaining Amount: {remaining_amount:.2f}", color="#FFFFFF")
+
     # Dropdown for Bill Status (Paid/Unpaid)
     bill_status_dropdown = ft.Dropdown(
         label="Bill Status",
@@ -215,6 +253,9 @@ def bill_updt(page, bill_id):
             controls=[
                 search_field,
                 item_table,
+                total_amount_text,
+                paid_input,
+                remaining_amount_text,
                 bill_status_dropdown,
                 save_button,
                 back_button,

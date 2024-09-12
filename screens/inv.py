@@ -39,7 +39,7 @@ class InventoryScreen:
 
     def add_item(self, e):
         """Trigger the add item pop-up."""
-        add_item_pop_up(self.page, self.inventory_db)
+        add_item_pop_up(self.page, self.inventory_db ,self.load_inventory)
         self.load_inventory() 
         self.page.update()
 
