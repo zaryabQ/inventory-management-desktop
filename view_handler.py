@@ -16,7 +16,9 @@ def views_handler(page: Page):
             bgcolor="#101010",
             scroll=False,
         
-            controls=[LoginScreen(page).build()],
+            # In view_handler.py
+            controls=[LoginScreen(page).build_login_screen()],
+
         ),
         "/Home": View(
             route="/Home",

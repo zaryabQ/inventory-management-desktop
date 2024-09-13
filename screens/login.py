@@ -2,6 +2,7 @@ import flet as ft
 from flet import *
 from screens.user import User
 from db.db_handler import get_user
+import asyncio
 
 class LoginScreen:
     def __init__(self, page: Page):
@@ -9,9 +10,9 @@ class LoginScreen:
 
     def handle_login(self, name_field, password_field):
         username = name_field.value.strip()
-        password = password_field.value.strip()
+        password = password_field.value.strip()  # Use password_field for password
 
-        # Input validations
+        # Validation: Check if username and password are provided
         if not username:
             name_field.error_text = "Username is required"
             self.page.update()
@@ -22,22 +23,19 @@ class LoginScreen:
             self.page.update()
             return
 
-        # Fetch user from database using the new db_handler function
-        user = get_user(username,password)
+        # Fetch user from the database
+        user = get_user(username, password)
 
-        if user:
-            if user[2] == password:
-                User.set_current_user(username, password)
-                print(f"Logged in as: {username}")
-                self.page.go("/Home")
-            else:
-                password_field.error_text = "Incorrect password"
+        if user and user[2] == password:
+            User.set_current_user(username, password)
+            print(f"Logged in as: {username}")
+            self.page.go("/Home")  # Navigate to home screen
         else:
-            name_field.error_text = "Username does not exist"
+            password_field.error_text = "Incorrect username or password"
+            self.page.update()
 
-        self.page.update()
 
-    def build(self):
+    def build_login_screen(self):
         name = TextField(
             label="Username",
             color=colors.BLACK,
@@ -63,8 +61,8 @@ class LoginScreen:
             width=120,
             style=ButtonStyle(
                 color=colors.BLACK,
-                bgcolor=colors.TEAL_ACCENT_700
-            )
+                bgcolor=colors.TEAL_ACCENT_700,
+            ),
         )
 
         logo = Icon(name=icons.ACCOUNT_CIRCLE, size=100, color=colors.BLACK)
@@ -111,3 +109,27 @@ class LoginScreen:
         )
 
         return fullsize
+
+    async def show_splash_screen(self):
+        # Define the splash screen layout
+        splash_screen = Container(
+            content=Image(
+                src="png/SKYLINK.png",  # Use your logo file here
+                width=200,
+                height=200,
+                fit=ImageFit.CONTAIN
+            ),
+            alignment=alignment.center,
+            expand=True,
+            bgcolor=colors.BLACK,  # Set the background color of the splash screen
+        )
+
+        self.page.add(splash_screen)  # Add splash screen to the page
+        self.page.update()
+
+        # Asynchronously wait for 6 seconds before transitioning to the login screen
+        await asyncio.sleep(3)
+        self.page.controls.clear()  # Clear the splash screen
+        self.page.add(self.build_login_screen())  # Add the login screen after the splash screen
+        self.page.update()
+
