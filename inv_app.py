@@ -5,7 +5,7 @@ from screens.user import User
 import asyncio
 
 def main(page:Page) ->None:
-    page.title = "Flet Inventory App"
+    page.title = "Inventory App"
     page.horizontal_alignment = MainAxisAlignment.CENTER
     page.vertical_alignment = MainAxisAlignment.CENTER
     page.window.width = page.window.width
@@ -17,7 +17,7 @@ def main(page:Page) ->None:
         # Create the splash screen image container
         splash_screen = Container(
             content=Image(
-                src="png/SKYLINK.png",
+                src="png/image.png",
                 fit=ImageFit.CONTAIN,
                 expand=True  # Expands to fill the available space
             ),
@@ -32,8 +32,8 @@ def main(page:Page) ->None:
 
         # Adjust the width and height of the image based on the window size
         def resize_image(e):
-            splash_screen.content.width = page.window_width * 0.7  # 60% of window width
-            splash_screen.content.height = page.window_height * 0.7  # 60% of window height
+            splash_screen.content.width = page.window_width * 1.0  # 60% of window width
+            splash_screen.content.height = page.window_height * 1.0  # 60% of window height
             page.update()
 
         # Bind the resize event to dynamically adjust the image size

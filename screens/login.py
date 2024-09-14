@@ -70,7 +70,7 @@ class LoginScreen:
         left_side = Container(
             bgcolor=colors.BLUE_GREY_900,
             content=Image(
-                src="png/—Pngtree—solar panels logo house and_5299554.png",
+                src="png/img 2.png",
                 fit=ImageFit.COVER,
                 expand=True
             ),
@@ -114,7 +114,7 @@ class LoginScreen:
         # Define the splash screen layout
         splash_screen = Container(
             content=Image(
-                src="png/SKYLINK.png",  # Use your logo file here
+                src="png/image.png",  # Use your logo file here
                 width=200,
                 height=200,
                 fit=ImageFit.CONTAIN
