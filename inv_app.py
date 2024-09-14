@@ -32,12 +32,12 @@ def main(page:Page) ->None:
 
         # Adjust the width and height of the image based on the window size
         def resize_image(e):
-            splash_screen.content.width = page.window_width * 1.0  # 60% of window width
-            splash_screen.content.height = page.window_height * 1.0  # 60% of window height
+            splash_screen.content.width = page.window.width * 1.0  # 60% of window width
+            splash_screen.content.height = page.window.height * 1.0  # 60% of window height
             page.update()
 
         # Bind the resize event to dynamically adjust the image size
-        page.on_resize = resize_image
+        on_resize = resize_image
 
         # Call resize function initially to set the image size on page load
         resize_image(None)
