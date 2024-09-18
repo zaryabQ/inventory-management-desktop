@@ -17,7 +17,7 @@ def main(page:Page) ->None:
         # Create the splash screen image container
         splash_screen = Container(
             content=Image(
-                src="png/image.png",
+                src="png/Blue Black Minimalist Solar Panel Logo.png",
                 fit=ImageFit.CONTAIN,
                 expand=True  # Expands to fill the available space
             ),
