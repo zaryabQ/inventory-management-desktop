@@ -16,15 +16,15 @@ class BillingScreen:
         self.page.theme = ft.Theme(
             scrollbar_theme=ft.ScrollbarTheme(
                 track_color={
-                    ft.MaterialState.HOVERED: "#D3D3D3",
-                    ft.MaterialState.DEFAULT: "#FFFFFF",
+                    ft.ControlState.HOVERED: "#D3D3D3",
+                    ft.ControlState.DEFAULT: "#FFFFFF",
                 },
                 track_visibility=True,
                 track_border_color="#D3D3D3",
                 thumb_visibility=True,
                 thumb_color={
-                    ft.MaterialState.HOVERED: "#A9A9A9",
-                    ft.MaterialState.DEFAULT: "#696969",
+                    ft.ControlState.HOVERED: "#A9A9A9",
+                    ft.ControlState.DEFAULT: "#696969",
                 },
                 thickness=10,
                 radius=10,
