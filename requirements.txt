@@ -1,0 +1,4 @@
+flet==0.26.0
+flet-desktop==0.26.0
+sqlite3
+pyinstaller==6.12.0

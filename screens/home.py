@@ -1,6 +1,23 @@
 import flet as ft
 import sqlite3
 from flet import *
+from screens.theme import (
+    ZeroYellowTheme, 
+    zero_yellow_container, 
+    zero_yellow_text, 
+    zero_yellow_button,
+    zero_yellow_icon,
+    # Legacy compatibility
+    IOS26Theme,
+    glass_container,
+    modern_card,
+    heading_text,
+    body_text,
+    caption_text,
+    modern_nav_bar,
+    modern_icon,
+    stat_card
+)
 
 class HomeScreen:
     def __init__(self, page: Page):
@@ -52,6 +69,43 @@ class HomeScreen:
 
         return total_items, low_stock_items, to_be_received_items
 
+    def create_stat_card(self, title, value, icon_name, color):
+        """Create a sophisticated stat card with monochromatic styling"""
+        display_value = f"Rs. {value:,}" if isinstance(value, (int, float)) else str(value)
+        return stat_card(
+            title=title,
+            value=display_value,
+            icon_name=icon_name,
+            icon_color=color
+        )
+
+    def create_navigation_button(self, text, route, icon_name, is_active=False):
+        """Create a modern navigation button with zero yellow styling"""
+        return zero_yellow_container(
+            content=Column(
+                controls=[
+                    zero_yellow_icon(
+                        icon=icon_name,
+                        size=24,
+                        color=ZeroYellowTheme.PURE_WHITE if is_active else ZeroYellowTheme.TEXT_QUATERNARY  # White when focused
+                    ),
+                    Container(height=8),
+                    zero_yellow_text(
+                        text,
+                        size=14,
+                        color=ZeroYellowTheme.PURE_WHITE if is_active else ZeroYellowTheme.TEXT_QUATERNARY,  # White when focused
+                        weight=FontWeight.W_500
+                    )
+                ],
+                horizontal_alignment=CrossAxisAlignment.CENTER,
+                spacing=4
+            ),
+            on_click=lambda _: self.page.go(route),
+            padding=16,
+            border_radius=12,
+            bgcolor=ZeroYellowTheme.BG_PRIMARY if is_active else ZeroYellowTheme.BG_GLASS,  # Dark background when focused
+            border_color=ZeroYellowTheme.GLASS_BORDER if is_active else "transparent"
+        )
 
     def build(self):
         # Fetch dynamic values from the database
@@ -60,134 +114,205 @@ class HomeScreen:
         total_cost = self.fetch_total_cost()
         total_items, low_stock_items, to_be_received_items = self.fetch_inventory_info()
 
-        # Left side menu bar
-        menu_bar = Container(
-            width=250,
-            bgcolor="#383838",
-            padding=10,
+        # Left side navigation with glass effect
+        navigation_bar = zero_yellow_container(
             content=Column(
-                expand=True,
                 controls=[
-                    Text("Dashboard", color="#00D0FF", size=20, weight="bold"),
                     Container(height=20),
-                    Container(
-                        width=180,
-                        height=50,
-                        margin=margin.only(bottom=30),
-                        content=ElevatedButton(
-                            on_click=lambda _: self.page.go("/Home"),
-                            text="Dashboard",
-                            bgcolor="#2C2C2C",
-                            color="white",
-                            expand=True,
-                        ),
+                    zero_yellow_text(
+                        "Dashboard",
+                        size=24,
+                        weight=FontWeight.BOLD,
+                        color=ZeroYellowTheme.PURE_BLACK  # Black heading for visibility
                     ),
-                    Container(
-                        width=180,
-                        height=50,
-                        margin=margin.only(bottom=30),
-                        content=ElevatedButton(
-                            on_click=lambda _: self.page.go("/Inventory"),
-                            text="Inventory",
-                            bgcolor="#2C2C2C",
-                            color="white",
-                            expand=True,
+                    Container(height=30),
+                    self.create_navigation_button("Dashboard", "/Home", Icons.DASHBOARD, True),
+                    Container(height=12),
+                    self.create_navigation_button("Inventory", "/Inventory", Icons.INVENTORY),
+                    Container(height=12),
+                    self.create_navigation_button("Billing", "/Billing", Icons.RECEIPT),
+                    Container(height=12),
+                    self.create_navigation_button("Settings", "/Settings", Icons.SETTINGS),
+                    Container(height=20),
+                    # User info section
+                    glass_container(
+                        content=Column(
+                            controls=[
+                                zero_yellow_icon(
+                                    icon=Icons.ACCOUNT_CIRCLE,
+                                    size=48,
+                                    color=ZeroYellowTheme.PURE_BLACK  # Black icon for visibility
+                                ),
+                                Container(height=8),
+                                body_text(
+                                    "Admin User",
+                                    size=16,
+                                    color=IOS26Theme.TEXT_PRIMARY,
+                                    weight=FontWeight.W_600
+                                ),
+                                caption_text(
+                                    "System Administrator",
+                                    size=12,
+                                    color=IOS26Theme.TEXT_TERTIARY
+                                )
+                            ],
+                            horizontal_alignment=CrossAxisAlignment.CENTER
                         ),
-                    ),
-                    Container(
-                        width=180,
-                        height=50,
-                        margin=margin.only(bottom=30),
-                        content=ElevatedButton(
-                            on_click=lambda _: self.page.go("/Billing"),
-                            text="Billing",
-                            bgcolor="#2C2C2C",
-                            color="white",
-                            expand=True,
-                        ),
-                    ),
-                    Container(
-                        width=180,
-                        height=50,
-                        margin=margin.only(bottom=30),
-                        content=ElevatedButton(
-                            on_click=lambda _: self.page.go("/Settings"),
-                            text="Settings",
-                            bgcolor="#2C2C2C",
-                            color="white",
-                            expand=True,
-                        ),
-                    ),
+                        padding=16,
+                        margin=0,
+                        bgcolor=IOS26Theme.GLASS_BACKGROUND
+                    )
                 ],
+                expand=True,
+                horizontal_alignment=CrossAxisAlignment.CENTER
             ),
+            width=280,
+            height=800,
+            padding=20,
+            margin=20,
+            bgcolor=IOS26Theme.GLASS_BACKGROUND
         )
 
-        # Right side content
+        # Main content area - responsive
         content_area = Container(
             expand=True,
-            bgcolor="#2b3037",
-            padding=25,
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,
+            padding=padding.symmetric(horizontal=20, vertical=15),  # Responsive padding
             content=Column(
-                horizontal_alignment=CrossAxisAlignment.CENTER,
-                alignment=MainAxisAlignment.CENTER,
-                expand=True,
                 controls=[
-                    Text(value="Welcome Back", color="#26A69A", size=40),
+                    # Header
                     Row(
-                        alignment=MainAxisAlignment.CENTER,
-                        expand=True,
                         controls=[
-                            Container(
-                                expand=True,  # Expand box according to available space
-                                bgcolor="white",
-                                border_radius=10,
-                                padding=10,
-                                content=Column(
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    alignment=MainAxisAlignment.CENTER,
-                                    expand=True,
-                                    controls=[
-                                        Text("Overview", size=40, weight="bold"),
-                                        Text("Total Sales", size=25,weight="bold"),
-                                        Text(f"Rs:{total_sales}", size=16),
-                                        Text("Profit", size=25,weight="bold"),
-                                        Text(f"Rs:{total_profit}", size=16),
-                                        Text("Total Cost", size=25,weight="bold"),
-                                        Text(f"Rs:{total_cost}", size=16),
-                                    ],
-                                ),
+                            Column(
+                                controls=[
+                                    heading_text(
+                                        "Welcome Back!",
+                                        size=36,
+                                        color=IOS26Theme.TEXT_PRIMARY
+                                    ),
+                                    body_text(
+                                        "Here's what's happening with your inventory today",
+                                        size=16,
+                                        color=IOS26Theme.TEXT_SECONDARY
+                                    )
+                                ],
+                                horizontal_alignment=CrossAxisAlignment.START
                             ),
-                            Container(
-                                expand=True,  # Expand box according to available space
-                                bgcolor="white",
-                                border_radius=10,
-                                padding=10,
-                                content=Column(
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    alignment=MainAxisAlignment.CENTER,
-                                    expand=True,
-                                    controls=[
-                                        Text("Inventory", size=40, weight="bold"),
-                                        Text("Total Items", size=25,weight="bold"),
-                                        Text(f"{total_items}", size=16),
-                                        Text("Low Stock", size=25,weight="bold"),
-                                        Text(f"{low_stock_items}", size=16),
-                                        Text("To be Received", size=25,weight="bold"),
-                                        Text(f"{to_be_received_items}", size=16),
-                                    ],
-                                ),
-                            ),
+                            Container(expand=True),
+                            modern_icon(
+                                name=Icons.NOTIFICATIONS,
+                                size=28,
+                                color=IOS26Theme.TEXT_SECONDARY
+                            )
                         ],
+                        alignment=MainAxisAlignment.SPACE_BETWEEN
                     ),
+                    Container(height=40),
+                    
+                    # Stats Grid
+                    Row(
+                        controls=[
+                            self.create_stat_card("Total Sales", total_sales, Icons.TRENDING_UP, IOS26Theme.ACCENT_PRIMARY),
+                            Container(width=20),
+                            self.create_stat_card("Total Profit", total_profit, Icons.ACCOUNT_BALANCE_WALLET, IOS26Theme.ACCENT_SECONDARY),
+                            Container(width=20),
+                            self.create_stat_card("Total Cost", total_cost, Icons.PAYMENTS, IOS26Theme.ACCENT_TERTIARY),
+                        ],
+                        alignment=MainAxisAlignment.START
+                    ),
+                    Container(height=30),
+                    
+                    # Inventory Overview
+                    Row(
+                        controls=[
+                            self.create_stat_card("Total Items", total_items, Icons.INVENTORY, IOS26Theme.ACCENT_PRIMARY),
+                            Container(width=20),
+                            self.create_stat_card("Low Stock", low_stock_items, Icons.WARNING, IOS26Theme.ACCENT_SECONDARY),
+                            Container(width=20),
+                            self.create_stat_card("To be Received", to_be_received_items, Icons.PENDING, IOS26Theme.ACCENT_TERTIARY),
+                        ],
+                        alignment=MainAxisAlignment.START
+                    ),
+                    Container(height=40),
+                    
+                    # Quick Actions
+                    zero_yellow_container(
+                        content=Column(
+                            controls=[
+                                zero_yellow_text(
+                                    "Quick Actions",
+                                    size=24,
+                                    weight=FontWeight.BOLD,
+                                    color=ZeroYellowTheme.TEXT_PRIMARY
+                                ),
+                                Container(height=20),
+                                Row(
+                                    controls=[
+                                        zero_yellow_container(
+                                            content=Column(
+                                                controls=[
+                                                    zero_yellow_icon(
+                                                        icon=Icons.ADD,
+                                                        size=32,
+                                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                                    ),
+                                                    Container(height=8),
+                                                    zero_yellow_text(
+                                                        "Add Item",
+                                                        size=14,
+                                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                                    )
+                                                ],
+                                                horizontal_alignment=CrossAxisAlignment.CENTER
+                                            ),
+                                            on_click=lambda _: self.page.go("/Inventory"),
+                                            padding=20,
+                                            border_radius=12,
+                                            bgcolor=ZeroYellowTheme.BG_TERTIARY
+                                        ),
+                                        Container(width=20),
+                                        zero_yellow_container(
+                                            content=Column(
+                                                controls=[
+                                                    zero_yellow_icon(
+                                                        icon=Icons.RECEIPT,
+                                                        size=32,
+                                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                                    ),
+                                                    Container(height=8),
+                                                    zero_yellow_text(
+                                                        "New Bill",
+                                                        size=14,
+                                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                                    )
+                                                ],
+                                                horizontal_alignment=CrossAxisAlignment.CENTER
+                                            ),
+                                            on_click=lambda _: self.page.go("/Billing"),
+                                            padding=20,
+                                            border_radius=12,
+                                            bgcolor=ZeroYellowTheme.BG_TERTIARY
+                                        )
+                                    ],
+                                    alignment=MainAxisAlignment.START
+                                )
+                            ],
+                            horizontal_alignment=CrossAxisAlignment.START
+                        ),
+                        padding=24,
+                        margin=0
+                    )
                 ],
-            ),
+                horizontal_alignment=CrossAxisAlignment.START,
+                expand=True
+            )
         )
 
-        # Main layout combining menu bar and content area
+        # Main layout combining navigation and content
         layout = Row(
             expand=True,
             controls=[
-                menu_bar,
+                navigation_bar,
                 content_area,
             ],
         )

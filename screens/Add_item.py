@@ -1,16 +1,25 @@
 import flet as ft
 from flet import *
 from db.inv_handler import InventoryHandler
+from screens.theme import (
+    ZeroYellowTheme, 
+    zero_yellow_container, 
+    zero_yellow_button, 
+    zero_yellow_text_field, 
+    zero_yellow_heading, 
+    zero_yellow_text,
+    zero_yellow_icon,
+    zero_yellow_snackbar,
+    # Legacy compatibility
+    IOS26Theme,
+    secondary_button
+)
 
 def add_item_pop_up(page, inventory_db, load_inv_callback):
 
     def show_snackbar(message):
         """Helper function to show a snackbar with a message."""
-        snackbar = ft.SnackBar(
-            content=ft.Text(message),
-            bgcolor=ft.colors.RED_800,
-            duration=2000  # Duration in milliseconds
-        )
+        snackbar = zero_yellow_snackbar(message)
         page.snack_bar = snackbar
         page.snack_bar.open = True
         page.update()
@@ -66,109 +75,89 @@ def add_item_pop_up(page, inventory_db, load_inv_callback):
 
     # Page settings
     page.title = "Inventory Management"
-    page.bgcolor = "#383838"  # Dark background
+    page.bgcolor = ZeroYellowTheme.BG_PRIMARY
 
     # Heading
-    heading = ft.Text(
-        "Add Items to Inventory",
-        size=30,
-        weight=ft.FontWeight.BOLD,
-        color='#26A69A',
-        font_family="Arial",  # Set the font family to Arial (or any other available font)
-        italic=True
+    heading = zero_yellow_heading(
+        "Add Items to Inventory"
     )
 
-    item_name = ft.TextField(
+    item_name = zero_yellow_text_field(
         hint_text="Enter Item Name",
-        bgcolor="white",
-        color="black",
-        border_radius=10,
-        text_align="center",
-        width=300
+        width=300,
+        height=50
     )
 
-    item_quantity = ft.TextField(
+    item_quantity = zero_yellow_text_field(
         hint_text="Enter the Quantity",
-        bgcolor="white",
-        color="black",
-        border_radius=10,
-        text_align="center",
-        width=300
+        width=300,
+        height=50
     )
 
-    buy_price = ft.TextField(
+    buy_price = zero_yellow_text_field(
         hint_text="Enter the Price",
-        bgcolor="white",
-        color="black",
-        border_radius=10,
-        text_align="center",
-        width=300
+        width=300,
+        height=50
     )
 
     # Creating the add button
-    add_button = ft.ElevatedButton(
-        "Add Item",
+    add_button = zero_yellow_button(
+        text="Add Item",
         on_click=save_item,
-        bgcolor="#26A69A",  # Light teal color
-        color="white",
-        width=150
+        width=150,
+        height=45
     )
 
-    back_button = ft.ElevatedButton(
-        "Back",
+    back_button = zero_yellow_button(
+        text="Back",
         on_click=add_item,
-        bgcolor="#26A69A",  # Light teal color
-        color="white",
-        width=150
+        width=150,
+        height=45,
+        primary=False
     )
 
     # Create the column for the input fields and button
-    content = ft.Column(
-        [
-            heading,  # Heading at the top
-            ft.Container(
-                content=ft.Column(
-                    [
-                        item_name,
-                        item_quantity,
-                        buy_price,
+    content = zero_yellow_container(
+        content=Column(
+            controls=[
+                heading,  # Heading at the top
+                Container(height=30),
+                item_name,
+                Container(height=10),
+                item_quantity,
+                Container(height=10),
+                buy_price,
+                Container(height=30),
+                Row(
+                    controls=[
+                        add_button,
+                        Container(width=20),
+                        back_button
                     ],
-                    spacing=20,
-                    alignment="center"
-                ),
-                alignment=ft.alignment.center,
-                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
-            ),
-            ft.Container(
-                content=add_button,
-                alignment=ft.alignment.center,
-                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
-            ),
-            ft.Container(
-                content=back_button,
-                alignment=ft.alignment.center,
-                padding=ft.padding.Padding(left=0, top=20, right=0, bottom=0)
-            )
-        ],
-        alignment="start",  # Start alignment for top-center positioning
-        horizontal_alignment="center",
-        spacing=20
-    )
-
-    # Main container to keep everything top-centered
-    main_container = ft.Container(
-        content=content,
-        alignment=ft.alignment.top_center,
-        padding=ft.Padding(left=0, right=0, top=30, bottom=0),
-        bgcolor="#2b3037",
-        expand=True
+                    alignment=MainAxisAlignment.CENTER
+                )
+            ],
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+            spacing=10
+        ),
+        width=400,
+        height=500,
+        padding=40,
+        margin=20
     )
 
     # Add the main container to the page
     page.views.append(
-        ft.View(
+        View(
             "/add_item",
-            controls=[main_container]
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,
+            controls=[
+                Container(
+                    content=content,
+                    alignment=alignment.center,
+                    expand=True
+                )
+            ]
         )
     )
     page.update()

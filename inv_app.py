@@ -2,28 +2,31 @@ import flet as ft
 from flet import *
 from view_handler import views_handler
 from screens.user import User
+from screens.theme import ZeroYellowTheme, configure_app_theme
 import asyncio
 
 def main(page:Page) ->None:
-    page.title = "Inventory App"
+    page.title = "Inventory Management System"
     page.horizontal_alignment = MainAxisAlignment.CENTER
     page.vertical_alignment = MainAxisAlignment.CENTER
     page.window.width = page.window.width
     page.window.height = page.window.height
-    page.bgcolor = "#101010"
+    
+    # Apply comprehensive theme configuration to eliminate all yellow colors
+    page = configure_app_theme(page)
     page.update()
 
     async def show_splash_screen():
-        # Create the splash screen image container
+        # Create the splash screen with AI interface styling
         splash_screen = Container(
-            content=Image(
-                src="png/Blue Black Minimalist Solar Panel Logo.png",
-                fit=ImageFit.CONTAIN,
-                expand=True  # Expands to fill the available space
-            ),
+                            content=Image(
+                    src="png/Blue Black Minimalist Solar Panel Logo.png",
+                    fit=ImageFit.CONTAIN,
+                    expand=True  # Expands to fill the available space
+                ),
             alignment=alignment.center,
             expand=True,  # Expands the container to the available window space
-            bgcolor=colors.BLACK,  # Set the background color of the splash screen
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,  # Set the background color of the splash screen
         )
 
         # Add the splash screen to the page
@@ -41,7 +44,6 @@ def main(page:Page) ->None:
 
         # Call resize function initially to set the image size on page load
         resize_image(None)
-
 
         # Asynchronously wait for 3 seconds before transitioning to the login screen
         await asyncio.sleep(3)

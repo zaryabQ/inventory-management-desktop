@@ -1,5 +1,24 @@
 import flet as ft
+from flet import *
 from db.billing_handler import BillingHandler
+from screens.theme import (
+    ZeroYellowTheme, 
+    zero_yellow_container, 
+    zero_yellow_button, 
+    zero_yellow_text_field, 
+    zero_yellow_text,
+    zero_yellow_icon,
+    zero_yellow_snackbar,
+    # Legacy compatibility
+    IOS26Theme,
+    glass_container,
+    primary_button,
+    secondary_button,
+    modern_text_field,
+    heading_text,
+    body_text,
+    modern_icon
+)
 
 def bill_updt(page, bill_id, load_bill_callback):
     global items, filtered_items, items_to_remove ,total_amount,remaining_amount,paid_amount
@@ -35,24 +54,26 @@ def bill_updt(page, bill_id, load_bill_callback):
 
         popup = ft.AlertDialog(
             modal=True,
-            title=ft.Text(f"Update {item['name']}" ,color="#26A69A"),
+            title=ft.Text(f"Update {item['name']}" ,color=IOS26Theme.TEXT_PRIMARY),
             content=ft.Column([
-                ft.TextField(label="Quantity", value=str(item['quantity']), bgcolor="#FFFFFF"),
-                ft.TextField(label="Selling Price", value=str(item['price']), bgcolor="#FFFFFF"),
+                modern_text_field(label="Quantity", value=str(item['quantity'])),
+                modern_text_field(label="Selling Price", value=str(item['price'])),
             ]),
+            bgcolor=IOS26Theme.BACKGROUND_TERTIARY,  # Override default dialog background
+            title_text_style=ft.TextStyle(color=IOS26Theme.TEXT_PRIMARY),
+            content_text_style=ft.TextStyle(color=IOS26Theme.TEXT_PRIMARY),
             actions=[
                 ft.TextButton(
                     "Save",
                     on_click=lambda e: [setattr(popup, 'open', False), update_item_details(item, popup.content)],
-                    style=ft.ButtonStyle(bgcolor="#2abfbf", color="#000000"),
+                    style=ft.ButtonStyle(bgcolor=IOS26Theme.ACCENT_PRIMARY, color=IOS26Theme.BACKGROUND_PRIMARY),
                 ),
                 ft.TextButton(
                     "Remove",
                     on_click=lambda e: [mark_item_for_removal(item_id), setattr(popup, 'open', False)],
-                    style=ft.ButtonStyle(bgcolor="#ff4d4d", color="#000000"),
+                    style=ft.ButtonStyle(bgcolor=IOS26Theme.ACCENT_QUATERNARY, color=IOS26Theme.TEXT_PRIMARY),
                 ),
             ],
-            bgcolor="#383838",
         )
         page.dialog = popup
         popup.open = True
@@ -82,17 +103,17 @@ def bill_updt(page, bill_id, load_bill_callback):
         update_item_table()
 
     def update_item_table():
-        item_table.controls.clear()
+        item_table.content.controls.clear()
         for item in filtered_items:
             item["container"] = ft.Container(
                 content=ft.Row(
                     controls=[
-                        ft.Text(item["name"], width=150, color="#000000", text_align=ft.TextAlign.CENTER),
-                        ft.Text(str(item["quantity"]), width=50, color="#000000", text_align=ft.TextAlign.CENTER),
-                        ft.Text(str(item["price"]), width=100, color="#000000", text_align=ft.TextAlign.CENTER),
+                        ft.Text(item["name"], width=150, color=IOS26Theme.TEXT_PRIMARY, text_align=ft.TextAlign.CENTER),
+                        ft.Text(str(item["quantity"]), width=50, color=IOS26Theme.TEXT_PRIMARY, text_align=ft.TextAlign.CENTER),
+                        ft.Text(str(item["price"]), width=100, color=IOS26Theme.TEXT_PRIMARY, text_align=ft.TextAlign.CENTER),
                         ft.IconButton(
-                            icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
-                            icon_color="#000000",
+                            icon=Icons.CHANGE_CIRCLE_OUTLINED,
+                            icon_color=IOS26Theme.ACCENT_PRIMARY,
                             tooltip="Update",
                             on_click=lambda e, item_id=item["id"]: update_item(e, item["id"])
                         ),
@@ -100,12 +121,13 @@ def bill_updt(page, bill_id, load_bill_callback):
                     spacing=10,
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
-                bgcolor="#FFFFFF",
-                padding=ft.padding.all(4),
-                border_radius=ft.border_radius.all(8),
+                bgcolor=IOS26Theme.GLASS_BACKGROUND,
+                padding=ft.padding.all(8),
+                border_radius=ft.border_radius.all(12),
                 margin=ft.margin.symmetric(vertical=3),
+                border=ft.border.all(1, IOS26Theme.GLASS_BORDER),
             )
-            item_table.controls.append(item["container"])
+            item_table.content.controls.append(item["container"])
         calculate_totals()
         page.update()
 
@@ -158,8 +180,8 @@ def bill_updt(page, bill_id, load_bill_callback):
         except ValueError as ve:
             # Alert the user in case of any validation errors (e.g., insufficient stock)
             page.snack_bar = ft.SnackBar(
-                content=ft.Text(str(ve)),
-                bgcolor="#FF0000"
+                content=ft.Text(str(ve), color=IOS26Theme.TEXT_PRIMARY),
+                bgcolor=IOS26Theme.ACCENT_QUATERNARY
             )
             page.snack_bar.open = True
             page.update()
@@ -167,8 +189,8 @@ def bill_updt(page, bill_id, load_bill_callback):
         except Exception as e:
             # Handle unexpected errors
             page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"Error: {str(e)}"),
-                bgcolor="#FF0000"
+                content=ft.Text(f"Error: {str(e)}", color=IOS26Theme.TEXT_PRIMARY),
+                bgcolor=IOS26Theme.ACCENT_QUATERNARY
             )
             page.snack_bar.open = True
             page.update()
@@ -179,104 +201,109 @@ def bill_updt(page, bill_id, load_bill_callback):
 
 
 
-    total_amount_text = ft.Text(value=f"Total Amount: {total_amount:.2f}", color="#FFFFFF")
-    paid_input = ft.TextField(label=f"Paid Amount", value=paid_amount, bgcolor="#FFFFFF", on_change=update_paid_amount)
-    remaining_amount_text = ft.Text(value=f"Remaining Amount: {remaining_amount:.2f}", color="#FFFFFF")
+    total_amount_text = ft.Text(value=f"Total Amount: {total_amount:.2f}", color=IOS26Theme.TEXT_PRIMARY)
+    paid_input = modern_text_field(label=f"Paid Amount", value=paid_amount, on_change=update_paid_amount)
+    remaining_amount_text = ft.Text(value=f"Remaining Amount: {remaining_amount:.2f}", color=IOS26Theme.TEXT_PRIMARY)
 
-    # Dropdown for Bill Status (Paid/Unpaid)
+    # Dropdown for Bill Status (Paid/Unpaid) - Override any yellow colors
     bill_status_dropdown = ft.Dropdown(
         label="Bill Status",
         options=[
             ft.dropdown.Option("Paid"),
             ft.dropdown.Option("Unpaid"),
         ],
-        bgcolor="#FFFFFF",
-        color="#000000",
+        bgcolor=IOS26Theme.GLASS_BACKGROUND,
+        color=IOS26Theme.TEXT_PRIMARY,
+        border_color=IOS26Theme.GLASS_BORDER,
+        focused_border_color=IOS26Theme.ACCENT_PRIMARY,
+        label_style=ft.TextStyle(color=IOS26Theme.TEXT_SECONDARY),
+        text_style=ft.TextStyle(color=IOS26Theme.TEXT_PRIMARY),
     )
 
-    name_field = ft.TextField(
+    name_field = modern_text_field(
             label="Enter Name/ID",
             value=bill_name,
-            bgcolor="#FFFFFF",
-            color="#000000",
-            border_radius=ft.border_radius.all(8),
+            width=300,
             height=50,
             text_align=ft.TextAlign.CENTER,
     )
 
-    search_field = ft.Container(
-        width=300,
-        height=45,
-        content=(name_field
-        ),
-        bgcolor="#000000",
-        border_radius=10,
-    )
-
-    item_table = ft.ListView(
+    # Wrap ListView in a glass container to override any default background colors
+    item_table_list = ft.ListView(
         controls=[],
         spacing=5,
         padding=10,
-        width=500,
-        height=300,
+        width=480,  # Slightly smaller to fit in glass container
+        height=280,
         auto_scroll=True,
     )
-
-    save_button = ft.Container(
-        content=ft.ElevatedButton(
-            text="Save",
-            width=150,
-            height=40,
-            color="#000000",
-            bgcolor="#2abfbf",
-            on_click=save_bill
-        ),
-        border_radius=ft.border_radius.all(20),
-        alignment=ft.alignment.center,
+    
+    item_table = zero_yellow_container(
+        content=item_table_list,
+        width=500,
+        height=300,
+        padding=padding.all(10),
+        margin=margin.all(0)
     )
 
-    back_button = ft.Container(
-        content=ft.ElevatedButton(
-            text="Back",
-            width=150,
-            height=40,
-            color="#000000",
-            bgcolor="#2abfbf",
-            on_click=go_back
-        ),
-        border_radius=ft.border_radius.all(20),
-        alignment=ft.alignment.center,
+    save_button = zero_yellow_button(
+        text="Save",
+        width=150,
+        height=45,
+        on_click=save_bill,
+        primary=True
     )
 
-    main_container = ft.Container(
+    back_button = zero_yellow_button(
+        text="Back",
+        width=150,
+        height=45,
+        on_click=go_back,
+        primary=False
+    )
+
+    main_container = zero_yellow_container(
         content=ft.Column(
             controls=[
-                search_field,
+                name_field,
+                Container(height=10),
                 item_table,
+                Container(height=10),
                 total_amount_text,
                 paid_input,
                 remaining_amount_text,
                 bill_status_dropdown,
-                save_button,
-                back_button,
+                Container(height=10),
+                Row(
+                    controls=[
+                        save_button,
+                        Container(width=20),
+                        back_button
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER
+                ),
             ],
-            spacing=20,
+            spacing=15,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         ),
-        width=550,
-        bgcolor="#383838",
-        padding=20,
-        border_radius=ft.border_radius.all(20),
+        width=700,  # Wider for better content
+        # Remove fixed height to auto-size
+        padding=padding.all(40),  # More generous padding
+        margin=margin.all(20)
     )
 
     page.views.append(
         ft.View(
             "/update_bill",
-            bgcolor="#2b3037",
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,
+            scroll=ScrollMode.AUTO,  # Make view scrollable
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Container(content=ft.Text("Update Bill", size=30, weight=ft.FontWeight.BOLD), alignment=ft.alignment.center),
+                        ft.Container(
+                            content=zero_yellow_text("Update Bill", size=30, weight=FontWeight.BOLD, color=ZeroYellowTheme.PURE_BLACK), 
+                            alignment=ft.alignment.center
+                        ),
                         ft.Container(content=main_container, alignment=ft.alignment.center),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,

@@ -1,11 +1,29 @@
 from flet import *
 import flet as ft
 from db.inv_handler import InventoryHandler
+from screens.theme import (
+    ZeroYellowTheme, 
+    zero_yellow_container, 
+    zero_yellow_button, 
+    zero_yellow_text_field, 
+    zero_yellow_text,
+    zero_yellow_icon,
+    zero_yellow_snackbar,
+    # Legacy compatibility
+    IOS26Theme,
+    glass_container,
+    primary_button,
+    secondary_button,
+    modern_text_field,
+    heading_text,
+    body_text,
+    modern_icon
+)
 
 def main_inv_upd(page, item_data, on_update):
-    name_field = ft.TextField(label="Product Name", value=item_data[1], bgcolor=ft.colors.WHITE, width=page.width * 0.4)
-    quantity_field = ft.TextField(label="Quantity", value=str(item_data[2]), bgcolor=ft.colors.WHITE, width=page.width * 0.4)
-    price_field = ft.TextField(label="Price", value=str(item_data[3]), bgcolor=ft.colors.WHITE, width=page.width * 0.4)
+    name_field = zero_yellow_text_field(label="Product Name", value=item_data[1], width=400, height=50)
+    quantity_field = zero_yellow_text_field(label="Quantity", value=str(item_data[2]), width=400, height=50)
+    price_field = zero_yellow_text_field(label="Price", value=str(item_data[3]), width=400, height=50)
 
     def update_action(e):
         empty_fields = []
@@ -17,10 +35,7 @@ def main_inv_upd(page, item_data, on_update):
             empty_fields.append("Price")
 
         if empty_fields:
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text(f"Fields missing: {', '.join(empty_fields)}. Please fill at least one field."),
-                action="DISMISS"
-            )
+            page.snack_bar = zero_yellow_snackbar(f"Fields missing: {', '.join(empty_fields)}. Please fill at least one field.")
             page.snack_bar.open = True
             page.update()
 
@@ -52,47 +67,58 @@ def main_inv_upd(page, item_data, on_update):
     page.views.append(
         ft.View(
             "/update",
-            bgcolor="#2b3037",
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,
+            scroll=ScrollMode.AUTO,  # Make view scrollable
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Container(
+                        zero_yellow_container(
                             content=ft.Column(
                                 controls=[
-                                    ft.Text(
+                                    zero_yellow_text(
                                         "Update Product",
                                         size=24,
-                                        weight=ft.FontWeight.BOLD,
-                                        color=ft.colors.WHITE,
-                                        font_family="Arial",
-                                        italic=True
+                                        weight=FontWeight.BOLD,
+                                        color=ZeroYellowTheme.PURE_BLACK  # Black heading
                                     ),
+                                    Container(height=30),  # More space after heading
                                     name_field,
+                                    Container(height=15),  # Better spacing
                                     quantity_field,
+                                    Container(height=15),  # Better spacing
                                     price_field,
-                                    ft.ElevatedButton(
-                                        "Update",
-                                        on_click=update_action,
-                                        bgcolor="#2abfbf",
-                                        color="#000000"
-                                    ),
-                                    ft.ElevatedButton(
-                                        "Back",
-                                        on_click=back_action,
-                                        bgcolor="#2abfbf",
-                                        color="#000000"
+                                    Container(height=40),  # More space before buttons
+                                    Row(
+                                        controls=[
+                                            zero_yellow_button(
+                                                text="Update",
+                                                on_click=update_action,
+                                                width=140,  # Slightly wider
+                                                height=50,  # Slightly taller
+                                                primary=True
+                                            ),
+                                            Container(width=30),  # More space between buttons
+                                            zero_yellow_button(
+                                                text="Back",
+                                                on_click=back_action,
+                                                width=140,  # Slightly wider
+                                                height=50,  # Slightly taller
+                                                primary=False
+                                            )
+                                        ],
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                        spacing=10  # Add spacing
                                     )
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER,
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                spacing=30,
+                                spacing=10,
                                 expand=True
                             ),
-                            padding=20,
-                            border_radius=20,
-                            bgcolor="#383838",
-                            width=page.width * 0.5,
-                            alignment=ft.alignment.center,
+                            width=page.width * 0.6,  # Slightly wider
+                            # Remove fixed height to auto-size
+                            padding=padding.all(40),  # More generous padding
+                            margin=margin.all(20)
                         ),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
@@ -119,49 +145,63 @@ def main_remove(page, item_id, on_remove):
     page.views.append(
         View(
             "/remove",
+            bgcolor=ZeroYellowTheme.BG_PRIMARY,
             controls=[
-                Column(
-                    controls=[
-                        Container(
-                            content=Text(
+                zero_yellow_container(
+                    content=Column(
+                        controls=[
+                            zero_yellow_text(
                                 "Are you sure you want to remove the entry?",
-                                color="red",
                                 size=24,
                                 weight=FontWeight.BOLD,
+                                color=ZeroYellowTheme.PURE_BLACK,  # Black heading
                                 text_align=TextAlign.CENTER
                             ),
-                            alignment=alignment.center,
-                            padding=padding.only(top=150)
-                        ),
-                        Row(
-                            controls=[
-                                IconButton(
-                                    icon=icons.CLOSE,
-                                    icon_color="white",
-                                    bgcolor="teal",
-                                    on_click=cancel_remove,
-                                    width=70,
-                                    height=70,
-                                    icon_size=40
-                                ),
-                                IconButton(
-                                    icon=icons.CHECK,
-                                    icon_color="white",
-                                    bgcolor="teal",
-                                    on_click=confirm_remove,
-                                    width=70,
-                                    height=70,
-                                    icon_size=40
-                                ),
-                            ],
-                            alignment=MainAxisAlignment.CENTER,
-                            spacing=50,
-                        ),
-                    ],
-                    alignment=MainAxisAlignment.CENTER,
-                    spacing=100,
+                            Container(height=40),
+                            Row(
+                                controls=[
+                                    Container(
+                                        content=zero_yellow_icon(
+                                        icon=Icons.CLOSE,
+                                        size=40,
+                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                    ),
+                                        on_click=cancel_remove,
+                                        padding=20,
+                                        border_radius=12,
+                                        bgcolor=ZeroYellowTheme.ERROR,
+                                        border=border.all(1, ZeroYellowTheme.GLASS_BORDER)
+                                    ),
+                                    Container(width=30),
+                                    Container(
+                                        content=zero_yellow_icon(
+                                        icon=Icons.CHECK,
+                                        size=40,
+                                        color=ZeroYellowTheme.TEXT_PRIMARY
+                                    ),
+                                        on_click=confirm_remove,
+                                        padding=20,
+                                        border_radius=12,
+                                        bgcolor=ZeroYellowTheme.SUCCESS,
+                                        border=border.all(1, ZeroYellowTheme.GLASS_BORDER)
+                                    ),
+                                ],
+                                alignment=MainAxisAlignment.CENTER,
+                                spacing=20,
+                            ),
+                        ],
+                        alignment=MainAxisAlignment.CENTER,
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        spacing=20,
+                    ),
+                    width=400,
+                    height=300,
+                    padding=40,
+                    margin=20
                 )
-            ]
+            ],
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+            vertical_alignment=MainAxisAlignment.CENTER,
         )
     )
     page.update()
